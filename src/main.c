@@ -28,6 +28,7 @@ void init_scene() {
   
   x3d_segmentbuilder_add_extruded_segment(x3d_segfaceid_create(id, 3), 200);
   
+  
   // Setup the camera
   // Setup the camera
   x3d_camera_init();
@@ -40,19 +41,100 @@ void init_scene() {
 
 GtkWidget* drawing_area;
 
+void redraw() {
+  gtk_widget_queue_draw(drawing_area);
+}
+
+extern int16 render_mode;
+
 gboolean on_key_press (GtkWidget *widget, GdkEventKey *event, gpointer user_data) {
   X3D_CameraObject* cam = x3d_playermanager_get()->player[0].cam;
+  X3D_Vex3D dir;
+  X3D_Vex3D_fp8x8 d;
   
-  switch (event->keyval)
-  {
-    case GDK_p:
-      cam->base.angle.y -= 2;
-      x3d_mat3x3_construct(&cam->base.mat, &cam->base.angle);
-      gtk_widget_queue_draw(drawing_area);
+  switch (event->keyval) {
+    case GDK_w:
+    
+      x3d_dynamicobject_forward_vector(&cam->base, &dir);
+
+#if 1
+    X3D_Vex3D_fp8x8 d = {
+      dir.x >> 4,
+      dir.y >> 4,
+      dir.z >> 4
+    };
+
+    cam->base.velocity = d;
+    x3d_object_move(&cam->base);
+#else
+
+    cam->base.base.pos.x += dir.x >> 5;
+    cam->base.base.pos.y += dir.y >> 5;
+    cam->base.base.pos.z += dir.z >> 5;
+
+#endif
+
+    //cam->base.base.pos.z += 4L << 8;
+    break;
+    
+    case GDK_s:
+    
+      x3d_dynamicobject_forward_vector(&cam->base, &dir);
+
+      #if 1
+       d = (X3D_Vex3D_fp8x8) {
+        -dir.x >> 4,
+        -dir.y >> 4,
+        -dir.z >> 4
+      };
+
+      cam->base.velocity = d;
+      x3d_object_move(&cam->base);
+  #else
+
+      cam->base.base.pos.x += dir.x >> 5;
+      cam->base.base.pos.y += dir.y >> 5;
+      cam->base.base.pos.z += dir.z >> 5;
+
+  #endif
+
+    //cam->base.base.pos.z += 4L << 8;
+#if 1
+  
       break;
-  }
+      
+  case GDK_q:
+    cam->base.angle.x -= 2;
+    x3d_mat3x3_construct(&cam->base.mat, &cam->base.angle);
+  
+  break;
+  
+  
+  case GDK_p:
+    render_mode = (render_mode + 1) % 4;
+    break;
+
+  case GDK_e:
+    cam->base.angle.x += 2;
+    x3d_mat3x3_construct(&cam->base.mat, &cam->base.angle);
+#endif
+
+    break;
+    
+  case GDK_Left:
+    cam->base.angle.y -= 2;
+    x3d_mat3x3_construct(&cam->base.mat, &cam->base.angle);
+    break;
+
+  case GDK_Right:
+    cam->base.angle.y += 2;
+    x3d_mat3x3_construct(&cam->base.mat, &cam->base.angle);
+    break;
   
   return FALSE;
+  }
+  
+  redraw();
 }
 
 
@@ -99,6 +181,79 @@ draw_callback (GtkWidget *widget, cairo_t *cr, gpointer data)
  return FALSE;
 }
 
+int16 mouse_x, mouse_y;
+_Bool mouse_search;
+X3D_SegFaceID select_face;
+
+static gboolean drawing_area_button_press_event (GtkWidget* widget, GdkEventButton* event, gpointer data) {
+  if(event->button == 1) {
+    mouse_search = X3D_TRUE;
+    mouse_x = event->x;
+    mouse_y = event->y;
+    redraw();
+  }
+  
+  return TRUE;
+}
+
+void segment_face_render_callback(X3D_SegmentRenderFace* face) {
+  if(mouse_search) {
+    if(mouse_y >= face->region->rect.y_range.min && mouse_y <= face->region->rect.y_range.max) {
+      int16 index = mouse_y - face->region->rect.y_range.min;
+      
+      if(mouse_x >= face->region->span[index].left && mouse_x <= face->region->span[index].right) {
+        select_face = face->id;
+        x3d_log(X3D_INFO, "ID: %d %d-%d", select_face, face->region->span[index].left, face->region->span[index].right);
+        face->color = 31;
+        mouse_search = X3D_FALSE;
+      }
+    }
+  }
+  else if(face->id == select_face) {
+    face->color = 31;
+  }
+}
+
+
+static void add_segment_callback( gchar *string ) {
+  uint16 id = x3d_segmentbuilder_add_extruded_segment(select_face, 200);
+  
+  select_face = x3d_segfaceid_create(id, 1);
+  redraw();
+}
+
+void scale_up() {
+  X3D_UncompressedSegment* seg = x3d_segmentmanager_get_internal(x3d_segfaceid_seg(select_face));
+  
+  X3D_Polygon3D poly = {
+    .v = alloca(1000)
+  };
+  
+  x3d_prism3d_get_face(&seg->prism, x3d_segfaceid_face(select_face), &poly);
+  x3d_polygon3d_scale(&poly, 256 + 128);
+  x3d_prism3d_set_face(&seg->prism, x3d_segfaceid_face(select_face), &poly);
+  
+  x3d_segmentmanager_cache_purge();
+  
+  redraw();
+}
+
+static void scale_down() {
+  X3D_UncompressedSegment* seg = x3d_segmentmanager_get_internal(x3d_segfaceid_seg(select_face));
+  
+  X3D_Polygon3D poly = {
+    .v = alloca(1000)
+  };
+  
+  x3d_prism3d_get_face(&seg->prism, x3d_segfaceid_face(select_face), &poly);
+  x3d_polygon3d_scale(&poly, 256 - 128);
+  x3d_prism3d_set_face(&seg->prism, x3d_segfaceid_face(select_face), &poly);
+  
+  x3d_segmentmanager_cache_purge();
+  
+  redraw();
+}
+
 int init_gtk(int argc, char *argv[]) {
 
   GtkWidget *window;
@@ -108,7 +263,7 @@ int init_gtk(int argc, char *argv[]) {
   GtkWidget *fileMenu;
   GtkWidget *fileMi;
   GtkWidget *newMi;
-  GtkWidget *openMi;
+  GtkWidget *scaleUp, *scaleDown;
   GtkWidget *quitMi;
 
   GtkWidget *sep;
@@ -118,9 +273,10 @@ int init_gtk(int argc, char *argv[]) {
   gtk_init(&argc, &argv);
 
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+  
   gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
   gtk_window_set_default_size(GTK_WINDOW(window), 640, 480);
-  gtk_window_set_title(GTK_WINDOW(window), "Images");
+  gtk_window_set_title(GTK_WINDOW(window), "XBuilder");
 
   vbox = gtk_vbox_new(0, 0);
   gtk_container_add(GTK_CONTAINER(window), vbox);
@@ -132,24 +288,36 @@ int init_gtk(int argc, char *argv[]) {
   gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
 
   fileMi = gtk_menu_item_new_with_mnemonic("_File");
-  newMi = gtk_image_menu_item_new_from_stock(GTK_STOCK_NEW, NULL);
-  openMi = gtk_image_menu_item_new_from_stock(GTK_STOCK_OPEN, NULL);
+  newMi = gtk_menu_item_new_with_label("Add Segment");
+  scaleUp = gtk_menu_item_new_with_label("Scale Up");
+  scaleDown = gtk_menu_item_new_with_label("Scale Down");
   sep = gtk_separator_menu_item_new();
   quitMi = gtk_image_menu_item_new_from_stock(GTK_STOCK_QUIT, accel_group);
 
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(fileMi), fileMenu);
   gtk_menu_shell_append(GTK_MENU_SHELL(fileMenu), newMi);
-  gtk_menu_shell_append(GTK_MENU_SHELL(fileMenu), openMi);
+  gtk_menu_shell_append(GTK_MENU_SHELL(fileMenu), scaleUp);
+  gtk_menu_shell_append(GTK_MENU_SHELL(fileMenu), scaleDown);
   gtk_menu_shell_append(GTK_MENU_SHELL(fileMenu), sep);
   gtk_menu_shell_append(GTK_MENU_SHELL(fileMenu), quitMi);
   gtk_menu_shell_append(GTK_MENU_SHELL(menubar), fileMi);
   gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 0);
+  
+  gtk_signal_connect_object (GTK_OBJECT (newMi), "activate",
+                               GTK_SIGNAL_FUNC (add_segment_callback),
+                               (gpointer) "file.open");
 
   g_signal_connect(G_OBJECT(window), "destroy",
       G_CALLBACK(gtk_main_quit), NULL);
 
   g_signal_connect(G_OBJECT(quitMi), "activate",
       G_CALLBACK(gtk_main_quit), NULL);
+  
+  g_signal_connect(G_OBJECT(scaleUp), "activate",
+      G_CALLBACK(scale_up), NULL);
+  
+  g_signal_connect(G_OBJECT(scaleDown), "activate",
+      G_CALLBACK(scale_down), NULL);
   
   drawing_area = gtk_drawing_area_new ();
   gtk_widget_set_size_request (drawing_area, 640, 480);
@@ -160,6 +328,16 @@ int init_gtk(int argc, char *argv[]) {
   gtk_widget_show(drawing_area);
 
   g_signal_connect (G_OBJECT (window), "key_press_event", G_CALLBACK (on_key_press), NULL);
+  
+  g_signal_connect (G_OBJECT (drawing_area), "button_press_event",
+      G_CALLBACK (drawing_area_button_press_event), NULL);
+  
+  gtk_widget_set_events (drawing_area, gtk_widget_get_events (drawing_area)
+           | GDK_LEAVE_NOTIFY_MASK
+           | GDK_BUTTON_PRESS_MASK
+           | GDK_POINTER_MOTION_MASK
+           | GDK_POINTER_MOTION_HINT_MASK);
+
   
   gtk_widget_show_all(window);
   
@@ -173,9 +351,16 @@ int main(int argc, char *argv[]) {
   init();
   init_scene();
   
+  select_face = x3d_segfaceid_create(0, 5);
+  
+  X3D_RenderManager* renderman = x3d_rendermanager_get();
+  
+  renderman->segment_face_render_callback = segment_face_render_callback;
+  renderman->near_z = 10;
+  
   x3d_screen_clear(0);
   x3d_render(x3d_playermanager_get()->player[0].cam);
-  
+
   init_gtk(argc, argv);
 
   
