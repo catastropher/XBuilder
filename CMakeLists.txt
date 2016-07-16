@@ -17,6 +17,8 @@ set(CMAKE_C_FLAGS "-std=c99 -Wall -g -fsanitize=address -fsanitize=undefined -Wn
 
 add_executable(XBuilder
   src/main.c
+  src/texturepack.c
+  src/linetexture_editor.c
 )
 
 find_package(SDL REQUIRED)
