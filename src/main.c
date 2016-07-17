@@ -8,7 +8,7 @@
 
 void init() {
   X3D_InitSettings init = {
-    .screen_w = 640,
+    .screen_w = 800,
     .screen_h = 480,
     .screen_scale = 1,
     .fullscreen = X3D_FALSE,
@@ -17,6 +17,8 @@ void init() {
   
   x3d_init(&init);
 }
+
+X3D_LineTexture3D logo;
 
 void xbuilder_linetexture_editor();
 
