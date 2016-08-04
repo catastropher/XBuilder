@@ -162,8 +162,8 @@ void handle_keys() {
     }
     
     // We need to make more room in the texture for editing!
-    texture.v = realloc(texture.v, sizeof(X3D_Vex2D) * 100);
-    texture.edges = realloc(texture.edges, sizeof(X3D_Pair) * 100);
+    texture.v = realloc(texture.v, sizeof(X3D_Vex2D) * 255);
+    texture.edges = realloc(texture.edges, sizeof(X3D_Pair) * 255);
   }
   
   if(x3d_key_down(KEY_TAB)) {
@@ -204,7 +204,7 @@ void xbuilder_linetexture_editor() {
   
   quit = X3D_FALSE;
 
-  x3d_linetexture2d_create_dynamically_allocated_texture(&texture, 100, 100);
+  x3d_linetexture2d_create_dynamically_allocated_texture(&texture, 255, 255);
   
   run();
 }

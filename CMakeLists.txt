@@ -19,6 +19,8 @@ add_executable(XBuilder
   src/main.c
   src/texturepack.c
   src/linetexture_editor.c
+  src/command.c
+  src/mouse.c
 )
 
 find_package(SDL REQUIRED)
