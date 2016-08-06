@@ -17,6 +17,8 @@
 #include "mouse.h"
 
 #include <SDL/SDL.h>
+#include <agar/core.h>
+#include <agar/gui.h>
 
 
 void init() {
@@ -29,6 +31,15 @@ void init() {
   };
   
   x3d_init(&init);
+  
+  SDL_Surface* x3d_internal_surface = x3d_screen_get_internal();
+  
+  if(AG_InitCore(NULL, 0) == -1 || AG_InitVideoSDL(x3d_internal_surface, 0) == -1) {
+    x3d_log(X3D_INFO, "Failed to init agar: %s\n", AG_GetError());
+    return (1);
+  }
+  
+  
 }
 
 X3D_LineTexture3D logo;
@@ -192,7 +203,7 @@ void draw_3d_grid(X3D_CameraObject* cam, X3D_Vex3D center, int16 cell_size, int1
 
 
 void test_render_callback(X3D_CameraObject* cam) {
-  draw_3d_grid(cam, x3d_vex3d_make(0, creation_plane_y, 0), 100, 20, 20);
+  draw_3d_grid(cam, x3d_vex3d_make(0, 0, 0), 100, 20, 20);
   handle_mouse_callback(cam);
   
   if(x3d_key_down(X3D_KEY_15)) {

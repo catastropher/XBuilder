@@ -44,6 +44,8 @@ void add_segment_left_click_callback(MouseHover* hover) {
   x3d_prism3d_set_center(&new_seg, &hover->creation_plane_intersection);
   
   x3d_level_add_new_standalone_segment(global_level, &new_seg, 0);
+  
+  x3d_level_add_extruded_segment(global_level, x3d_segfaceid_create(0, 3), 400);
 }
 
 extern int16 creation_plane_y;
