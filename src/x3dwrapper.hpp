@@ -28,7 +28,9 @@
 struct XVex3D : X3D_Vex3D {
     XVex3D() { }
     XVex3D(X3D_Vex3D& v) {
-        *this = v;
+        x = v.x;
+        y = v.y;
+        z = v.z;
     }
 };
 
@@ -69,9 +71,19 @@ struct XPolygon3D : X3D_Polygon3D {
 };
 
 struct XPrism3D : X3D_Prism3D {
-    XPrism3D(int base_v_) {
+    explicit XPrism3D(int base_v_) {
         base_v = base_v_;
         v = new XVex3D[base_v * 2];
+    }
+    
+    XPrism3D(const X3D_Prism3D& prism) : XPrism3D(prism.base_v) {
+        for(int i = 0; i < prism.base_v * 2; ++i)
+            v[i] = prism.v[i];
+    }
+    
+    XPrism3D(const XPrism3D& prism) : XPrism3D(prism.base_v) {
+        for(int i = 0; i < prism.base_v * 2; ++i)
+            v[i] = prism.v[i];
     }
     
     static XPrism3D construct(uint16 steps, uint16 r, int16 h, X3D_Vex3D_angle256 rot_angle) {

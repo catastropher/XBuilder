@@ -29,7 +29,7 @@ struct LevelPrism {
     XPrism3D toXPrism3D() {
         XPrism3D prism(base_v);
         
-        for(int i = 0; i < base_v; ++i)
+        for(int i = 0; i < base_v * 2; ++i)
             prism.v[i] = *v[i];
         
         return prism;
@@ -62,8 +62,8 @@ private:
         LevelPrism level_prism;
         level_prism.base_v = prism.base_v;
         
-        for(int i = 0; i < prism.base_v; ++i)
-            level_prism.v[i] = &addVertex(prism.v[i]);
+        for(int i = 0; i < prism.base_v * 2; ++i)
+            level_prism.v.push_back(&addVertex(prism.v[i]));
         
         return level_prism;
     }
@@ -71,6 +71,9 @@ private:
     LevelSegment& newSegment(XPrism3D geometry) {
         LevelPrism level_geo = addGeometry(geometry);
         LevelSegment* seg = new LevelSegment(level_geo);
+        
+        segments.push_back(seg);
+        
         return *seg;
     }
     
@@ -80,5 +83,7 @@ public:
     LevelVertex& addVertex(XVex3D vertex);
     LevelSegment& addSegment(X3D_Prism3D geometry);
     LevelSegment& extrudeSegment(LevelSegment& segment, int16 face, int16 extrude_dist);
+    
+    X3D_Level buildX3DLevel();
 };
 

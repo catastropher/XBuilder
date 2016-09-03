@@ -32,13 +32,8 @@ LevelVertex& LevelBuilder::addVertex(XVex3D vertex) {
     return *new_v;
 }
 
-LevelSegment& LevelBuilder::addSegment(X3D_Prism3D geometry) {
-    LevelSegment& seg = newSegment(geometry.base_v);
-    
-    for(int i = 0; i < geometry.base_v * 2; ++i)
-        seg.geometry.v[i] = &addVertex(geometry.v[i]);
-    
-    return seg;
+LevelSegment& LevelBuilder::addSegment(X3D_Prism3D geometry) {    
+    return newSegment(geometry);
 }
 
 LevelSegment& LevelBuilder::extrudeSegment(LevelSegment& segment, int16 face, int16 extrude_dist) {
@@ -58,5 +53,18 @@ LevelSegment& LevelBuilder::extrudeSegment(LevelSegment& segment, int16 face, in
     return newSegment(new_seg_geo);
 }
 
+X3D_Level LevelBuilder::buildX3DLevel() {
+    X3D_Level level;
+    x3d_level_init(&level);
+    
+    x3d_log(X3D_INFO, "Size: %d", segments.size());
+    
+    for(LevelSegment* seg : segments) {
+        XPrism3D prism = seg->getGeometry();
+        x3d_level_add_new_standalone_segment(&level, &prism, 0);
+    }
+    
+    return level;
+}
 
 
