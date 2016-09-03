@@ -20,26 +20,61 @@
 #include <agar/core.h>
 #include <agar/gui.h>
 
+AG_Pixmap* x3d_pixmap;
+AG_Surface* x3d_surface = NULL;
+
+
+void xbuilder_update_x3d_pixmap() {
+  static int surface = -1;
+  
+  if(x3d_surface != NULL) {
+    AG_SurfaceFree(x3d_surface);
+  }
+  
+  x3d_screen_clear(0);
+  x3d_render(x3d_playermanager_get()->player[0].cam);
+  x3d_surface = AG_SurfaceFromSDL(x3d_screen_get_internal());
+  
+  if(surface == -1) {
+    surface = AG_PixmapAddSurface(x3d_pixmap, x3d_surface);
+  }
+  else {
+    AG_PixmapReplaceSurface(x3d_pixmap, surface, x3d_surface);
+  }
+  
+  AG_PixmapSetSurface(x3d_pixmap, surface);
+}
+
+void MouseButtonUp(AG_Event* ev) {
+  x3d_log(X3D_INFO, "Clicked!");
+}
 
 void init() {
   X3D_InitSettings init = {
     .screen_w = 640,
     .screen_h = 480,
     .screen_scale = 1,
-    .fullscreen = X3D_FALSE,
+    .fullscreen = X3D_TRUE,
     .fov = ANG_60,
+    .flags = X3D_INIT_VIRTUAL_SCREEN
   };
   
   x3d_init(&init);
   
-  SDL_Surface* x3d_internal_surface = x3d_screen_get_internal();
-  
-  if(AG_InitCore(NULL, 0) == -1 || AG_InitVideoSDL(x3d_internal_surface, 0) == -1) {
+  if(AG_InitCore(NULL, 0) == -1 || AG_InitGraphics(0) == -1) {
     x3d_log(X3D_INFO, "Failed to init agar: %s\n", AG_GetError());
     return (1);
   }
   
+  AG_Window* win = AG_WindowNew(0);
+  AG_LabelNew(win, 0, "Hello, world!");
   
+  x3d_pixmap = AG_PixmapNew(win, 0, 640, 480);
+  
+  AG_SetEvent(x3d_pixmap, "mouse-button-down", MouseButtonUp, NULL);
+  
+  
+  AG_WindowShow(win);
 }
 
 X3D_LineTexture3D logo;
@@ -219,7 +254,7 @@ int main() {
   x3d_level_init(&level);
   
   init();
-
+  
   setup_key_map();
 
   x3d_keymanager_set_callback(xbuilder_handle_keys);
@@ -233,10 +268,13 @@ int main() {
   cam->base.base.pos.x = 0;
   cam->base.base.pos.y = -50 * 256;
   
-  command_add_segment();
+  //command_add_segment();
   
   global_level = &level;
-  x3d_game_loop();
+  //x3d_game_loop();
+  
+  xbuilder_update_x3d_pixmap();
+  AG_EventLoop();
   
   //xbuilder_linetexture_editor();
   x3d_cleanup();

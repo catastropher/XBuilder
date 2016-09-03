@@ -3,13 +3,11 @@ cmake_minimum_required(VERSION 2.6)
 project(XBuilder)
 
 set(CMAKE_C_FLAGS "-std=c99 -Wall -g -fsanitize=address -fsanitize=undefined -Wno-pointer-sign ")
+set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -g -fsanitize=address -fsanitize=undefined -Wno-pointer-sign")
 
 add_executable(XBuilder
-  src/main.c
-  src/texturepack.c
-  src/linetexture_editor.c
-  src/command.c
-  src/mouse.c
+  src/main.cpp
+  src/levelbuilder.cpp
 )
 
 set(Agar_DIR ".")
