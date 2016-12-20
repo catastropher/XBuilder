@@ -8,20 +8,17 @@ set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -g -fsanitize=address -fsanitize=undefined
 add_executable(XBuilder
   src/main.cpp
   src/levelbuilder.cpp
+  src/keys.cpp
+  src/tool.cpp
 )
 
 set(Agar_DIR ".")
 
-find_package(SDL REQUIRED)
-find_package(Agar REQUIRED)
-target_link_libraries(XBuilder $ENV{X3D}/build/X3D/libX3D.a)
-target_link_libraries(XBuilder SDLmain ${SDL_LIBRARY})
+target_link_libraries(XBuilder /usr/local/lib/libX3D.a)
+target_link_libraries(XBuilder SDLmain SDL2)
 target_link_libraries(XBuilder m)
 
-include_directories($ENV{X3D}/src/headers)
-include_directories(${LibAgar_INCLUDE_DIRS})
+include_directories(/usr/local/include/X3D)
 
 
-# Link the target to the GTK+ libraries
-target_link_libraries(XBuilder ${GTK2_LIBRARIES})
 target_link_libraries(XBuilder ${LibAgar_LIBRARIES})
