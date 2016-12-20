@@ -40,24 +40,33 @@ X3D_LightMapContext lightmap_context;
 extern X3D_Level* global_level;
 int16 creation_plane_y;
 
-void construct_horizontal_plane(X3D_Plane* plane, int16 y) {
-    plane->normal.x = 0;
-    plane->normal.y = -0x7FFF;
-    plane->normal.z = 0;
-    plane->d = y;
-}
-
 
 void xbuilder_handle_keys(void);
 
 extern ToolManager* globalToolState;
 
+void renderAllSegments(X3D_Level* level, X3D_CameraObject* cam) {
+    X3D_Vex3D v[32];
+    X3D_Prism3D prism;
+    prism.v = v;
+    
+    X3D_ColorIndex red = x3d_color_to_colorindex(x3d_rgb_to_color(255, 0, 0));
+    
+    for(int16 i = 0; i < x3d_level_total_segs(level); ++i) {
+        X3D_LevelSegment* seg = x3d_level_get_segmentptr(level, i);
+        
+        x3d_levelsegment_get_geometry(level, seg, &prism);
+        x3d_prism3d_render_wireframe(&prism, cam, red);
+    }
+}
+
 extern "C" void test_render_callback(X3D_CameraObject* cam) {
-    x3d_render_3d_grid(cam, x3d_vex3d_make(0, creation_plane_y, 0), 100, 20, 20);
+    //x3d_render_3d_grid(cam, x3d_vex3d_make(0, creation_plane_y, 0), 100, 20, 20);
     //handle_mouse_callback(cam);
     
     //render_level(global_level, cam);
     
+    renderAllSegments(global_level, cam);
     globalToolState->renderLevel(cam);
 }
 

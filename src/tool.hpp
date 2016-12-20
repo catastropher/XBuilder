@@ -33,6 +33,11 @@ struct MouseState {
         
         return state;
     }
+    
+    static void waitForLeftMouseRelease() {
+        while(getCurrentMouseState().leftPressed)
+            x3d_read_keys();
+    }
 };
 
 struct Tool;
@@ -55,6 +60,8 @@ struct ToolManager {
     void handleKeys();
     
     void renderLevel(X3D_CameraObject* cam);
+    
+    void renderSelectedFace(X3D_CameraObject* cam);
     
     void resetSelectedFaces() {
         selectedFaces[0] = X3D_FACE_NONE;
@@ -84,6 +91,8 @@ struct Tool {
     
     virtual void handleMouse(MouseState& state) { }
     virtual void handleKeys() { }
+    virtual void render(X3D_CameraObject* cam) { }
+    virtual void run() { }
     
     bool mouseIsHoveringOverLevelGeometry(MouseState& mouseState, X3D_SegFaceID& hoverGeometryId) {
         X3D_RayTracer raytracer;
@@ -113,6 +122,126 @@ struct SelectFaceTool : Tool {
             return;
         
         toolState.selectedFaces[selectFaceIndex] = mouseHover;
+    }
+};
+
+struct AddNewSegTool : Tool {
+    int creationPlaneY;
+    X3D_Vex3D creationLocation;
+    bool drawPrism;
+    X3D_Prism3D prism;
+    X3D_Vex3D prismV[32];
+    
+    AddNewSegTool(ToolManager& toolState_, int creationPlaneY_, int prismBaseV) : Tool(toolState_), creationPlaneY(creationPlaneY_) {
+        prism.v = prismV;
+        
+        x3d_prism3d_construct(&prism, 8, 200, 200, (X3D_Vex3D_angle256) { 0, 0, 0 });
+    }
+    
+    void handleMouse(MouseState& mouseState) {
+        drawPrism = calculateCreationPosFromMouse(mouseState);
+        
+        if(drawPrism)
+            x3d_prism3d_set_center(&prism, &creationLocation);
+        
+        if(!mouseState.leftPressed)
+            return;
+        
+        
+        x3d_level_add_new_standalone_segment(toolState.level, &prism, 0);
+        
+        MouseState::waitForLeftMouseRelease();
+    }
+    
+    void render(X3D_CameraObject* cam) {
+        if(drawPrism) {
+            X3D_ColorIndex gray = x3d_color_to_colorindex(x3d_rgb_to_color(64, 64, 64));
+            x3d_prism3d_render_wireframe(&prism, cam, gray);
+        }
+    }
+    
+private:
+    static X3D_Plane constructHorizontalPlane(int16 y) {
+        X3D_Plane plane;
+        
+        plane.normal.x = 0;
+        plane.normal.y = -0x7FFF;
+        plane.normal.z = 0;
+        plane.d = y;
+        
+        return plane;
+    }
+    
+    bool calculateCreationPosFromMouse(MouseState& mouseState) {
+        X3D_RayTracer raytracer;
+        x3d_raytracer_init_from_point_on_screen(&raytracer, toolState.level, toolState.cam, mouseState.pos);
+        
+        X3D_Plane plane = constructHorizontalPlane(creationPlaneY);
+        int16 dist;
+        
+        return x3d_line3d_intersect_plane(&raytracer.ray, &plane, &creationLocation, &dist);
+    }
+};
+
+struct ConnectFacesTool : Tool {
+    ConnectFacesTool(ToolManager& toolState_) : Tool(toolState_) { }
+    
+    void run() {
+        if(!toolState.faceIsSelected(0) || !toolState.faceIsSelected(1)) {
+            x3d_log(X3D_ERROR, "Please select two faces to connect");
+            return;
+        }
+        
+        x3d_level_add_segment_connecting_faces(toolState.level, toolState.getSelectedFace(0), toolState.getSelectedFace(1));
+    }
+};
+
+struct ExtrudeFaceTool : Tool {
+    ExtrudeFaceTool(ToolManager& toolState_) : Tool(toolState_) { }
+    
+    void run() {
+        if(!toolState.faceIsSelected(0)) {
+            x3d_log(X3D_ERROR, "Please select a face to extrude");
+            return;
+        }
+        
+        x3d_level_add_extruded_segment(toolState.level, toolState.getSelectedFace(0), 200);
+    }
+};
+
+struct ExpandFaceTool : Tool {
+    ExpandFaceTool(ToolManager& toolState_) : Tool(toolState_) { }
+    
+    void run() {
+        if(!toolState.faceIsSelected(0)) {
+            x3d_log(X3D_ERROR, "Please select a face to expand");
+            return;
+        }
+        
+        X3D_Polygon3D poly;
+        poly.v = (X3D_Vex3D *)alloca(1000);
+        
+        x3d_levelsegment_get_face_geometry(toolState.level, toolState.getSelectedFace(0), &poly);
+        x3d_polygon3d_scale(&poly, 256 + 64);
+        x3d_levelsegment_update_face_geometry(toolState.level, toolState.getSelectedFace(0), &poly);
+    }
+};
+
+struct ShrinkFaceTool : Tool {
+    ShrinkFaceTool(ToolManager& toolState_) : Tool(toolState_) { }
+    
+    void run() {
+        if(!toolState.faceIsSelected(0)) {
+            x3d_log(X3D_ERROR, "Please select a face to expand");
+            return;
+        }
+        
+        X3D_Polygon3D poly;
+        poly.v = (X3D_Vex3D *)alloca(1000);
+        
+        x3d_levelsegment_get_face_geometry(toolState.level, toolState.getSelectedFace(0), &poly);
+        x3d_polygon3d_scale(&poly, 256 - 64);
+        x3d_levelsegment_update_face_geometry(toolState.level, toolState.getSelectedFace(0), &poly);
     }
 };
 

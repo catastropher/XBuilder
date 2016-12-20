@@ -30,6 +30,38 @@ bool ToolManager::handleChangeToolKeys() {
         setActiveTool(new SelectFaceTool(*this, 0));
         return true;
     }
+    else if(x3d_pc_key_down('g')) {
+        setActiveTool(new SelectFaceTool(*this, 1));
+        return true;
+    }
+    else if(x3d_pc_key_down('l')) {
+        setActiveTool(new AddNewSegTool(*this, 0, 8));
+        return true;
+    }
+    else if(x3d_pc_key_down('c')) {
+        ConnectFacesTool(*this).run();
+        
+        while(x3d_pc_key_down('c'))
+            x3d_read_keys();
+    }
+    else if(x3d_pc_key_down('e')) {
+        ExtrudeFaceTool(*this).run();
+        
+        while(x3d_pc_key_down('e'))
+            x3d_read_keys();
+    }
+    else if(x3d_pc_key_down('=')) {
+        ExpandFaceTool(*this).run();
+        
+        while(x3d_pc_key_down('='))
+            x3d_read_keys();
+    }
+    else if(x3d_pc_key_down('-')) {
+        ShrinkFaceTool(*this).run();
+        
+        while(x3d_pc_key_down('-'))
+            x3d_read_keys();
+    }
     
     return false;
 }
@@ -47,7 +79,7 @@ void ToolManager::handleMouse(MouseState& mouseState) {
         activeTool->handleMouse(mouseState);
 }
 
-void ToolManager::renderLevel(X3D_CameraObject* cam) {
+void ToolManager::renderSelectedFace(X3D_CameraObject* cam) {
     X3D_Vex3D v[32];
     X3D_Prism3D prism;
     prism.v = v;
@@ -56,24 +88,46 @@ void ToolManager::renderLevel(X3D_CameraObject* cam) {
     X3D_ColorIndex white = x3d_color_to_colorindex(x3d_rgb_to_color(255, 255, 255));
     X3D_ColorIndex blue = x3d_color_to_colorindex(x3d_rgb_to_color(0, 0, 255));
     
+    X3D_ColorIndex faceAColor = blue;
+    X3D_ColorIndex faceBColor = white;
+    
     X3D_ColorIndex faceColors[] = { blue, white };
     
-    for(int segId = 0; segId < x3d_level_total_segs(level); ++segId) {
-        X3D_LevelSegment* seg = x3d_level_get_segmentptr(level, segId);
-        x3d_levelsegment_get_geometry(level, seg, &prism);
-        
-        Prism3DRenderer renderer(prism);
-        renderer.colorEntirePrism(red);
-        
-        for(int faceIndex = 0; faceIndex < 2; ++faceIndex) {
-            if(faceIsSelected(faceIndex) && selectedFaceParentSeg(faceIndex) == segId) {
-                renderer.colorFace(x3d_segfaceid_face(getSelectedFace(faceIndex)), faceColors[faceIndex]);
-            }
+    if(faceIsSelected(0) && faceIsSelected(1)) {
+        if(selectedFaceParentSeg(0) == selectedFaceParentSeg(1)) {
+            X3D_LevelSegment* seg = x3d_level_get_segmentptr(level, selectedFaceParentSeg(0));
+            x3d_levelsegment_get_geometry(level, seg, &prism);
+            
+            Prism3DRenderer renderer(prism);
+            renderer.colorEntirePrism(red);
+            
+            renderer.colorFace(x3d_segfaceid_face(getSelectedFace(0)), faceAColor);
+            renderer.colorFace(x3d_segfaceid_face(getSelectedFace(1)), faceBColor);
+            renderer.render(cam);
+            
+            return;
         }
-        
-        
-        renderer.render(cam);
     }
+    
+    for(int faceIndex = 0; faceIndex < 2; ++faceIndex) {
+        if(faceIsSelected(faceIndex)) {
+            X3D_LevelSegment* seg = x3d_level_get_segmentptr(level, selectedFaceParentSeg(faceIndex));
+            x3d_levelsegment_get_geometry(level, seg, &prism);
+            
+            Prism3DRenderer renderer(prism);
+            renderer.colorEntirePrism(red);
+            
+            renderer.colorFace(x3d_segfaceid_face(getSelectedFace(faceIndex)), faceColors[faceIndex]);
+            renderer.render(cam);
+        }
+    }
+}
+
+void ToolManager::renderLevel(X3D_CameraObject* cam) {
+    renderSelectedFace(cam);
+    
+    if(activeTool)
+        activeTool->render(cam);
 }
 
 

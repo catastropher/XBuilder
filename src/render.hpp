@@ -23,6 +23,7 @@ struct Prism3DRenderer {
     X3D_Prism3D prism;
     X3D_ColorIndex edgeColors[MAX_EDGES_IN_PRISM3D];
     
+    Prism3DRenderer() { }
     Prism3DRenderer(X3D_Prism3D& prism_) : prism(prism_) { }
     
     void colorEntirePrism(X3D_ColorIndex color) {
