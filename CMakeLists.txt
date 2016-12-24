@@ -13,14 +13,20 @@ add_executable(XBuilder
   
   src/pack/DirectoryScanner.cpp
   src/pack/ResourcePack.cpp
+  
+  src/imgui/imgui_impl_sdl_gl3.cpp
+  src/imgui/imgui.cpp
+  src/imgui/imgui_draw.cpp
 )
 
 find_package(Boost REQUIRED COMPONENTS filesystem)
+find_package(OpenGL REQUIRED VERSION 3)
 
 target_link_libraries(XBuilder ${Boost_LIBRARIES})
 target_link_libraries(XBuilder /usr/local/lib/libX3D.a)
 target_link_libraries(XBuilder SDLmain SDL2)
 target_link_libraries(XBuilder m)
+target_link_libraries(XBuilder ${OPENGL_LIBRARIES})
 
 include_directories(/usr/local/include/X3D)
 

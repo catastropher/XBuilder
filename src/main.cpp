@@ -85,8 +85,8 @@ void testPack() {
 }
 
 int main() {
-    testPack();
-    return 0;
+    //testPack();
+    //return 0;
     
     
     LevelBuilder builder;

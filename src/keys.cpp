@@ -78,10 +78,61 @@ void handle_movement_keys(X3D_CameraObject* cam) {
 //     }
 //}
 
+
+void xbuilder_handler_record() {
+    const int KEY_RECORD = '0';
+    
+    static _Bool rec = X3D_FALSE;
+    
+    if(x3d_pc_key_down(KEY_RECORD)) {
+        while(x3d_pc_key_down(KEY_RECORD)) {
+            x3d_read_keys();
+        }
+        
+        if(!rec) {
+            system("rm -rf ~/record");
+            system("mkdir ~/record");
+            
+            printf("Begin recording in (hold M to abort):\n");
+            
+            _Bool record = X3D_TRUE;
+            
+            int16 i;
+            for(i = 3; i >= 1; --i) {
+                printf("%d\n", i);
+                SDL_Delay(1000);
+                
+                x3d_read_keys();
+                if(x3d_pc_key_down(KEY_RECORD)) {
+                    printf("Recording aborted\n");
+                    while(x3d_pc_key_down(KEY_RECORD)) {
+                        x3d_read_keys();
+                    }
+                    
+                    record = X3D_FALSE;
+                    break;
+                }
+            }
+            
+            if(record) {
+                printf("Begin!\n");
+                x3d_screen_begin_record("/home/michael/record/frame");
+                rec = X3D_TRUE;
+            }
+        }
+        else {
+            printf("Recording complete\n");
+            x3d_screen_record_end();
+            rec = X3D_FALSE;
+        }
+    }
+}
+
 void xbuilder_handle_keys(void) {
     X3D_CameraObject* cam = x3d_playermanager_get()->player[0].cam;
     
     handle_movement_keys(cam);
+    xbuilder_handler_record();
     
     globalToolState->handleKeys();
     
