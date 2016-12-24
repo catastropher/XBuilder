@@ -62,6 +62,18 @@ bool ToolManager::handleChangeToolKeys() {
         while(x3d_pc_key_down('-'))
             x3d_read_keys();
     }
+    else if(x3d_pc_key_down('1')) {
+        SaveLevelTool(*this).run();
+        
+        while(x3d_pc_key_down('1'))
+            x3d_read_keys();
+    }
+    else if(x3d_pc_key_down('2')) {
+        LoadLevelTool(*this).run();
+        
+        while(x3d_pc_key_down('2'))
+            x3d_read_keys();
+    }
     
     return false;
 }

@@ -10,15 +10,17 @@ add_executable(XBuilder
   src/levelbuilder.cpp
   src/keys.cpp
   src/tool.cpp
+  
+  src/pack/DirectoryScanner.cpp
+  src/pack/ResourcePack.cpp
 )
 
-set(Agar_DIR ".")
+find_package(Boost REQUIRED COMPONENTS filesystem)
 
+target_link_libraries(XBuilder ${Boost_LIBRARIES})
 target_link_libraries(XBuilder /usr/local/lib/libX3D.a)
 target_link_libraries(XBuilder SDLmain SDL2)
 target_link_libraries(XBuilder m)
 
 include_directories(/usr/local/include/X3D)
 
-
-target_link_libraries(XBuilder ${LibAgar_LIBRARIES})

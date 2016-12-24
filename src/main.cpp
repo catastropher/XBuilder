@@ -70,15 +70,34 @@ extern "C" void test_render_callback(X3D_CameraObject* cam) {
     globalToolState->renderLevel(cam);
 }
 
+#include "pack/ResourcePack.hpp"
+
+void testPack() {
+    ResourcePackBuilder builder;
+    builder.addFilesFromDirectoryToPackDirectory("/home/michael/code/X3D-68k/src/C/", "src");
+    builder.addFilesFromDirectoryToPackDirectory("/home/michael/code/X3D-68k/src/headers/", "headers");
+    builder.writePackFile("test.pak");
+    
+    X3D_ResourcePack pack;
+    x3d_resourcepack_load_from_file(&pack, "test.pak");
+    x3d_resourcepack_print_file_header(&pack);
+    x3d_resourcepack_cleanup(&pack);
+}
+
 int main() {
+    testPack();
+    return 0;
+    
+    
     LevelBuilder builder;
     XPrism3D p = XPrism3D::construct(8, 400, 400, { 0, 0, 0 });
     LevelSegment& seg = builder.addSegment(p);
-    builder.extrudeSegment(builder.extrudeSegment(seg, 3, 200), 1, 200);
-    builder.extrudeSegment(seg, 1, 200);
-    builder.extrudeSegment(seg, 8, 200);
+    //builder.extrudeSegment(builder.extrudeSegment(seg, 3, 200), 1, 200);
+    //builder.extrudeSegment(seg, 1, 200);
+    //builder.extrudeSegment(seg, 8, 200);
     
-    X3D_Level level = builder.buildX3DLevel();
+    X3D_Level level;// = builder.buildX3DLevel();
+    x3d_level_init(&level);
     
     init();
     

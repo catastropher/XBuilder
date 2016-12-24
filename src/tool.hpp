@@ -16,6 +16,8 @@
 #pragma once
 
 #include <X3D/X3D.h>
+#include <iostream>
+#include <string>
 
 struct MouseState {
     X3D_Vex2D pos;
@@ -242,6 +244,42 @@ struct ShrinkFaceTool : Tool {
         x3d_levelsegment_get_face_geometry(toolState.level, toolState.getSelectedFace(0), &poly);
         x3d_polygon3d_scale(&poly, 256 - 64);
         x3d_levelsegment_update_face_geometry(toolState.level, toolState.getSelectedFace(0), &poly);
+    }
+};
+
+struct SaveLevelTool : Tool {
+    SaveLevelTool(ToolManager& toolState_) : Tool(toolState_) { }
+    
+    void run() {
+        std::cout << "Filename to save to: ";
+        
+        std::string fileName;
+        std::getline(std::cin, fileName);
+        
+        if(!x3d_level_save(toolState.level, fileName.c_str())) {
+            x3d_log(X3D_ERROR, "Failed to save level");
+        }
+        else {
+            x3d_log(X3D_INFO, "Level saved successfully");
+        }
+    }
+};
+
+struct LoadLevelTool : Tool {
+    LoadLevelTool(ToolManager& toolState_) : Tool(toolState_) { }
+    
+    void run() {
+        std::cout << "Filename to load from: ";
+        
+        std::string fileName;
+        std::getline(std::cin, fileName);
+        
+        if(!x3d_level_load(toolState.level, fileName.c_str())) {
+            x3d_log(X3D_ERROR, "Failed to load level");
+        }
+        else {
+            x3d_log(X3D_INFO, "Level loaded successfully");
+        }
     }
 };
 
