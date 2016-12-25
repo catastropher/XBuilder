@@ -28,6 +28,61 @@ SDL_GLContext glcontext;
 
 using namespace std;
 
+extern "C" void test_render_callback(X3D_CameraObject* cam);
+
+class X3DRenderWindow {
+private:
+    GLuint renderTextureId;
+    
+public:
+    X3DRenderWindow() {
+        X3D_Texture tex = createTextureForRenderOuput();
+        renderTextureId = OpenGLTextureManager::addX3DTexture(&tex);
+    }
+    
+    void render() {
+        x3d_read_keys();
+        x3d_screen_clear(0);
+        test_render_callback(x3d_playermanager_get()->player[0].cam);
+        x3d_keymanager_get()->key_handler();
+        updateRenderOutputTexture();
+        
+        ImGui::SetNextWindowSize(ImVec2(640, 480), ImGuiSetCond_Always);
+        bool show_another_window = true;
+        ImGui::Begin("X3D", &show_another_window, ImVec2(640, 480), -1.0f, ImGuiWindowFlags_NoMove);
+        
+        X3D_Texture tex = createTextureForRenderOuput();
+        ImGui::Image((void*)renderTextureId, ImVec2(tex.w, tex.h));
+        
+        if(ImGui::IsItemClicked()) {
+            ImVec2 mousePos = ImGui::GetMousePos();
+            ImVec2 windowPos = ImGui::GetWindowPos();
+            ImVec2 relativePos = ImVec2(mousePos.x - windowPos.x, mousePos.y - windowPos.y);
+            
+            printf("Clicked %f %f!\n", relativePos.x, relativePos.y);
+        }
+        
+        ImGui::End();
+    }
+    
+private:
+    X3D_Texture createTextureForRenderOuput() {
+        X3D_ScreenManager* screenman = x3d_screenmanager_get();
+        X3D_Texture tex;
+        
+        tex.texels = screenman->buf;
+        tex.w = screenman->w;
+        tex.h = screenman->h;
+        
+        return tex;
+    }
+    
+    void updateRenderOutputTexture() {
+        X3D_Texture tex = createTextureForRenderOuput();
+        OpenGLTextureManager::updateX3DTexture(renderTextureId, &tex);
+    }
+};
+
 struct TexturePicker {
     vector<LevelTexture*> textures;
     LevelTexture* selectedTexture = NULL;
@@ -106,16 +161,28 @@ void setupWindow() {
     ImGui_ImplSdlGL3_Init(window);
 }
 
+#include "pack/DirectoryScanner.hpp"
+
 void initGUI() {
     setupWindow();
     
     bool done = X3D_FALSE;
     ImVec4 clear_color = ImColor(114, 144, 154);
 
-    TextureManager::loadTexture("checkerboard.bmp");
-    TextureManager::loadTexture("floor.bmp");
+    //TextureManager::loadTexture("checkerboard.bmp");
+    //TextureManager::loadTexture("floor.bmp");
+    
+    DirectoryScanner scanner("tex/quaketex", false);
+    
+    vector<string> files = scanner.recursivelyScanFiles();
+    
+    for(string file : files) {
+        //TextureManager::loadTexture(file);
+    }
     
     TexturePicker picker(TextureManager::getTextures());
+    
+    X3DRenderWindow x3dWindow;
     
     char test[256] = "50";
     
@@ -124,6 +191,7 @@ void initGUI() {
         while (SDL_PollEvent(&event))
         {
             ImGui_ImplSdlGL3_ProcessEvent(&event);
+            x3d_pc_send_event(&event);
             if (event.type == SDL_QUIT)
                 done = true;
         }
@@ -146,6 +214,8 @@ void initGUI() {
         //ImGui::EndChild();
         
         ImGui::End();
+        
+        x3dWindow.render();
         
         // Rendering
         glViewport(0, 0, (int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y);

@@ -23,23 +23,10 @@ struct MouseState {
     X3D_Vex2D pos;
     bool leftPressed;
     bool rightPressed;
+    bool hoverInWindow;
     
-    static MouseState getCurrentMouseState() {
-        MouseState state;
-        
-        int16 x, y;
-        x3d_pc_mouse_state(&state.leftPressed, &state.rightPressed, &x, &y);
-        
-        state.pos.x = x;
-        state.pos.y = y;
-        
-        return state;
-    }
-    
-    static void waitForLeftMouseRelease() {
-        while(getCurrentMouseState().leftPressed)
-            x3d_read_keys();
-    }
+    MouseState(bool leftPressed_, bool rightPressed_, X3D_Vex2D pos_, bool hoverInWindow_) :
+        leftPressed(leftPressed_), rightPressed(rightPressed_), pos(pos_), hoverInWindow(hoverInWindow_) { }
 };
 
 struct Tool;
@@ -141,6 +128,9 @@ struct AddNewSegTool : Tool {
     }
     
     void handleMouse(MouseState& mouseState) {
+        if(!mouseState.hoverInWindow)
+            return;
+        
         drawPrism = calculateCreationPosFromMouse(mouseState);
         
         if(drawPrism)
@@ -151,8 +141,6 @@ struct AddNewSegTool : Tool {
         
         
         x3d_level_add_new_standalone_segment(toolState.level, &prism, 0);
-        
-        MouseState::waitForLeftMouseRelease();
     }
     
     void render(X3D_CameraObject* cam) {

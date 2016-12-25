@@ -28,6 +28,7 @@ private:
     
 public:
     static GLuint addX3DTexture(X3D_Texture* tex);
+    static void updateX3DTexture(GLuint id, X3D_Texture* updatedTexture);
     
     ~OpenGLTextureManager();
 };

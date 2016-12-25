@@ -41,6 +41,12 @@ vector<unsigned char> OpenGLTextureManager::convertX3DTextureToByteArray(X3D_Tex
     return texturePixels;
 }
 
+void OpenGLTextureManager::updateX3DTexture(GLuint id, X3D_Texture* updatedTexture) {
+    vector<unsigned char> texturePixels = convertX3DTextureToByteArray(updatedTexture);
+    glBindTexture(GL_TEXTURE_2D, id);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, updatedTexture->w, updatedTexture->h, GL_RGBA, GL_UNSIGNED_BYTE, &texturePixels[0]);
+}
+
 OpenGLTextureManager::~OpenGLTextureManager() {
     glDeleteTextures(loadedTextures.size(), &loadedTextures[0]);
 }

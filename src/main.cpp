@@ -73,13 +73,8 @@ extern "C" void test_render_callback(X3D_CameraObject* cam) {
 #include "pack/ResourcePack.hpp"
 
 void testPack() {
-    ResourcePackBuilder builder;
-    builder.addFilesFromDirectoryToPackDirectory("/home/michael/code/X3D-68k/src/C/", "src");
-    builder.addFilesFromDirectoryToPackDirectory("/home/michael/code/X3D-68k/src/headers/", "headers");
-    builder.writePackFile("test.pak");
-    
     X3D_ResourcePack pack;
-    x3d_resourcepack_load_from_file(&pack, "test.pak");
+    x3d_resourcepack_load_from_file(&pack, "quake1.pak");
     x3d_resourcepack_print_file_header(&pack);
     x3d_resourcepack_cleanup(&pack);
 }
@@ -103,9 +98,6 @@ int main() {
     
     init();
     
-    initGUI();
-    return 0;
-    
     //setup_key_map();
 
     x3d_rendermanager_set_render_mode(X3D_RENDER_NONE);
@@ -125,9 +117,10 @@ int main() {
     ToolManager toolState(cam, global_level);
     globalToolState = &toolState;
     
+    initGUI();
     
     //command_add_segment();
-    x3d_game_loop();
+    //x3d_game_loop();
     
     
     //xbuilder_linetexture_editor();

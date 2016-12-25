@@ -136,8 +136,8 @@ void xbuilder_handle_keys(void) {
     
     globalToolState->handleKeys();
     
-    MouseState mouseState = MouseState::getCurrentMouseState();
-    globalToolState->handleMouse(mouseState);
+    //MouseState mouseState = MouseState::getCurrentMouseState();
+    //globalToolState->handleMouse(mouseState);
     
     _Bool left, right;
     int16 mouse_x, mouse_y;
