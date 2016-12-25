@@ -10,6 +10,7 @@ add_executable(XBuilder
   src/levelbuilder.cpp
   src/keys.cpp
   src/tool.cpp
+  src/texture.cpp
   
   src/pack/DirectoryScanner.cpp
   src/pack/ResourcePack.cpp
@@ -17,6 +18,8 @@ add_executable(XBuilder
   src/imgui/imgui_impl_sdl_gl3.cpp
   src/imgui/imgui.cpp
   src/imgui/imgui_draw.cpp
+  
+  src/gui/gui.cpp
 )
 
 find_package(Boost REQUIRED COMPONENTS filesystem)
@@ -29,4 +32,5 @@ target_link_libraries(XBuilder m)
 target_link_libraries(XBuilder ${OPENGL_LIBRARIES})
 
 include_directories(/usr/local/include/X3D)
+include_directories(src/)
 

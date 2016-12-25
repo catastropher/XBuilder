@@ -27,7 +27,7 @@ void init() {
         .screen_scale = 1,
         .fullscreen = X3D_TRUE,
         .fov = ANG_60,
-        .flags = 0
+        .flags = X3D_INIT_VIRTUAL_SCREEN
     };
     
     x3d_init(&init);
@@ -84,6 +84,8 @@ void testPack() {
     x3d_resourcepack_cleanup(&pack);
 }
 
+void initGUI();
+
 int main() {
     //testPack();
     //return 0;
@@ -100,6 +102,9 @@ int main() {
     x3d_level_init(&level);
     
     init();
+    
+    initGUI();
+    return 0;
     
     //setup_key_map();
 
