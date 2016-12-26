@@ -19,4 +19,5 @@
 #include "Plane.hpp"
 #include "Ray.hpp"
 #include "Polygon.hpp"
+#include "Prism.hpp"
 

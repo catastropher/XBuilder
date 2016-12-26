@@ -22,85 +22,85 @@
 
 namespace Level {
 
-class Level;
-struct SegmentEditor;
-struct FaceEditor;
-    
-struct Vertex {
-    Vec3 v;
-    
-    Vertex(Vec3 v_) : v(v_) { }
-    
-    bool operator<(const Vertex& vertex) const {
-        float a[3] = { v.x, v.y, v.z };
-        float b[3] = { vertex.v.x, vertex.v.y, vertex.v.z };
+    class Level;
+    struct SegmentEditor;
+    struct FaceEditor;
         
-        for(int i = 0; i < 3; ++i) {
-            if(a[i] < b[i])
-                return true;
-            else if(a[i] > b[i])
-                return false;
+    struct Vertex {
+        Vec3 v;
+        
+        Vertex(Vec3 v_) : v(v_) { }
+        
+        bool operator<(const Vertex& vertex) const {
+            float a[3] = { v.x, v.y, v.z };
+            float b[3] = { vertex.v.x, vertex.v.y, vertex.v.z };
+            
+            for(int i = 0; i < 3; ++i) {
+                if(a[i] < b[i])
+                    return true;
+                else if(a[i] > b[i])
+                    return false;
+            }
+            
+            return false;
+        }
+    };
+
+    struct Face {
+        
+    };
+
+    struct Segment {
+        int id;
+    };
+
+    class SegmentEditor {
+    public:
+        SegmentEditor(Level& level_, Segment& seg_);
+        
+        FaceEditor getEditorForFace(int faceId);
+        
+    private:
+        Level& level;
+        Segment& seg;
+    };
+
+
+    class FaceEditor {
+    public:
+        FaceEditor(SegmentEditor& segEditor_, int faceId_);
+        
+    private:
+        SegmentEditor segEditor;
+        int faceId;
+    };
+
+
+    class Level {
+    public:
+        SegmentEditor getEditorForSegment(int segId);
+        FaceEditor getEditorForFace(int segId, int faceId);
+        
+    private:
+        Segment& getSegment(int segId) {
+            return *segments[segId];
         }
         
-        return false;
-    }
-};
-
-struct Face {
-    
-};
-
-struct Segment {
-    int id;
-};
-
-class SegmentEditor {
-public:
-    SegmentEditor(Level& level_, Segment& seg_);
-    
-    FaceEditor getEditorForFace(int faceId);
-    
-private:
-    Level& level;
-    Segment& seg;
-};
-
-
-class FaceEditor {
-public:
-    FaceEditor(SegmentEditor& segEditor_, int faceId_);
-    
-private:
-    SegmentEditor segEditor;
-    int faceId;
-};
-
-
-class Level {
-public:
-    SegmentEditor getEditorForSegment(int segId);
-    FaceEditor getEditorForFace(int segId, int faceId);
-    
-private:
-    Segment& getSegment(int segId) {
-        return *segments[segId];
-    }
-    
-    int addVertex(Vertex v) {
-        if(vertexMap.count(v) != 0)
-            return vertexMap[v];
+        int addVertex(Vertex v) {
+            if(vertexMap.count(v) != 0)
+                return vertexMap[v];
+            
+            int newVertexId = vertices.size();
+            
+            vertices.push_back(v);
+            vertexMap[v] = newVertexId;
+            
+            return newVertexId;
+        }
         
-        int newVertexId = vertices.size();
-        
-        vertices.push_back(v);
-        vertexMap[v] = newVertexId;
-        
-        return newVertexId;
-    }
-    
-    std::vector<Segment*> segments;
-    std::vector<Vertex> vertices;
-    std::map<Vertex, int> vertexMap;
-};
+        std::vector<Segment*> segments;
+        std::vector<Vertex> vertices;
+        std::map<Vertex, int> vertexMap;
+    };
 
 }

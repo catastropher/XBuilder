@@ -22,6 +22,7 @@
 struct Polygon3D {
     std::vector<Vec3> vertices;
     
+    Polygon3D() { }
     Polygon3D(int totalVertices_) : vertices(totalVertices_) { }
     Polygon3D(std::vector<Vec3>& v) : vertices(v) { }
     
