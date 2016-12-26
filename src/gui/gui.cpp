@@ -52,7 +52,7 @@ public:
         ImGui::Begin("X3D", &show_another_window, ImVec2(640, 480), -1.0f, ImGuiWindowFlags_NoMove);
         
         X3D_Texture tex = createTextureForRenderOuput();
-        ImGui::Image((void*)renderTextureId, ImVec2(tex.w, tex.h));
+        ImGui::Image((void*)(size_t)renderTextureId, ImVec2(tex.w, tex.h));
         
         if(ImGui::IsItemClicked()) {
             ImVec2 mousePos = ImGui::GetMousePos();
@@ -113,7 +113,7 @@ struct TexturePicker {
         ImGui::BeginChild("textures");
         
         string search(searchText);
-        for(int i = 0; i < textures.size(); ++i) {
+        for(int i = 0; i < (int)textures.size(); ++i) {
             if(textures[i]->getName().find(search) != string::npos)
                 renderTextureButton(textures[i], i);
         }
@@ -183,8 +183,6 @@ void initGUI() {
     TexturePicker picker(TextureManager::getTextures());
     
     X3DRenderWindow x3dWindow;
-    
-    char test[256] = "50";
     
     while(!done) {
         SDL_Event event;

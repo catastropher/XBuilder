@@ -143,7 +143,7 @@ void xbuilder_handle_keys(void) {
     int16 mouse_x, mouse_y;
     x3d_pc_mouse_state(&left, &right, &mouse_x, &mouse_y);
     
-    X3D_Vex2D mouse_pos = { mouse_x, mouse_y };
+    //X3D_Vex2D mouse_pos = { mouse_x, mouse_y };
     
     //handle_geo_selector_keys(geo_selector);
     //geo_selector.handleMouse(mouse_pos, left, right, cam);

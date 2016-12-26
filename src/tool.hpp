@@ -20,9 +20,9 @@
 #include <string>
 
 struct MouseState {
-    X3D_Vex2D pos;
     bool leftPressed;
     bool rightPressed;
+    X3D_Vex2D pos;
     bool hoverInWindow;
     
     MouseState(bool leftPressed_, bool rightPressed_, X3D_Vex2D pos_, bool hoverInWindow_) :

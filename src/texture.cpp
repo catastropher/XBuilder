@@ -94,7 +94,7 @@ LevelTexture* TextureManager::loadTexture(string fileName) {
 }
 
 void LevelTexture::renderInGUI() {
-    ImGui::ImageButton((void *)(GLuint)glTextureId, ImVec2(getWidth(), getHeight()));
+    ImGui::ImageButton((void *)(size_t)glTextureId, ImVec2(getWidth(), getHeight()));
     ImGui::Text("floor.tex");
 }
 

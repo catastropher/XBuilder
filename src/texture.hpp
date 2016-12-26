@@ -65,7 +65,7 @@ public:
     }
    
     void* getImguiId() const {
-        return (void *)(GLuint)glTextureId;
+        return (void *)(size_t)glTextureId;
     }
    
     void renderInGUI();
