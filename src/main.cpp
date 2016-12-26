@@ -16,8 +16,7 @@
 #include <X3D/X3D.h>
 #include <SDL2/SDL.h>
 
-#include "x3dwrapper.hpp"
-#include "levelbuilder.hpp"
+#include "level/Level.hpp"
 #include "tool.hpp"
 
 void init() {
@@ -84,14 +83,6 @@ void initGUI();
 int main() {
     //testPack();
     //return 0;
-    
-    
-    LevelBuilder builder;
-    XPrism3D p = XPrism3D::construct(8, 400, 400, { 0, 0, 0 });
-    LevelSegment& seg = builder.addSegment(p);
-    //builder.extrudeSegment(builder.extrudeSegment(seg, 3, 200), 1, 200);
-    //builder.extrudeSegment(seg, 1, 200);
-    //builder.extrudeSegment(seg, 8, 200);
     
     X3D_Level level;// = builder.buildX3DLevel();
     x3d_level_init(&level);
