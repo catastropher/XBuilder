@@ -49,7 +49,7 @@ public:
         
         ImGui::SetNextWindowSize(ImVec2(640, 480), ImGuiSetCond_Always);
         bool show_another_window = true;
-        ImGui::Begin("X3D", &show_another_window, ImVec2(640, 480), -1.0f, ImGuiWindowFlags_NoMove);
+        ImGui::Begin("X3D", &show_another_window, ImVec2(640, 480), -1.0f);
         
         X3D_Texture tex = createTextureForRenderOuput();
         ImGui::Image((void*)(size_t)renderTextureId, ImVec2(tex.w, tex.h));

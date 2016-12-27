@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with XBuilder. If not, see <http://www.gnu.org/licenses/>.
 
+#pragma once
+
 #include <vector>
 #include <X3D/X3D.h>
 #include <map>
@@ -45,62 +47,130 @@ namespace Level {
             return false;
         }
     };
-
-    struct Face {
+    
+    struct LevelPrism {
+    public:
+        LevelPrism(std::vector<Vertex*> vertices_) : vertices(vertices_) { }
         
+        int baseVertices() const {
+            return vertices.size() / 2;
+        }
+        
+        int totalFaces() const {
+            return baseVertices() + 2;
+        }
+        
+        Prism3D getGeometry() const {
+            std::vector<Vec3> v;
+
+            for(int i = 0; i < (int)vertices.size(); ++i)
+                v.push_back(vertices[i]->v);
+            
+            return Prism3D(v);
+        }
+        
+        void updateGeometry(Prism3D& updatedGeometry) {
+            for(int i = 0; i < (int)vertices.size(); ++i)
+                vertices[i]->v = updatedGeometry.getVertex(i);
+        }
+        
+    private:
+        std::vector<Vertex*> vertices;
+    };
+    
+    class VertexManager {
+    public:
+        Vertex* addVertex(Vec3 v) {
+            Vertex vertex(v);
+            
+            if(vertices.count(vertex) != 0)
+                return vertices[vertex];
+            
+            Vertex* newVertex = new Vertex(v);
+            vertices[vertex] = newVertex;
+            
+            return newVertex;
+        }
+        
+        LevelPrism addLevelPrism(Prism3D& geometry) {
+            std::vector<Vertex*> v;
+            
+            for(int i = 0; i < geometry.totalVertices(); ++i)
+                v.push_back(addVertex(geometry.getVertex(i)));
+            
+            return LevelPrism(v);
+        }
+        
+        ~VertexManager() {
+            for(auto v : vertices) {
+                delete v.second;
+            }
+            
+            vertices.clear();
+        }
+        
+    private:
+        std::map<Vertex, Vertex*> vertices;
     };
 
-    struct Segment {
+    struct Segment;
+    struct Level;
+    
+    class SegmentFace {
+    public:
+        SegmentFace(Segment& seg_, int id_) : seg(seg_), id(id_) { }
+        
+        Polygon3D getGeometry() const;
+        
+    private:
+        Segment& seg;
         int id;
     };
-
-    class SegmentEditor {
+    
+    class Segment {
     public:
-        SegmentEditor(Level& level_, Segment& seg_);
+        Segment(Level& level_, LevelPrism& geometry_, int id_) : level(level_), geometry(geometry_), id(id_) {
+            for(int i = 0; i < geometry_.totalFaces(); ++i)
+                faces.push_back(SegmentFace(*this, i));
+        }
         
-        FaceEditor getEditorForFace(int faceId);
+        Prism3D getGeometry() const {
+            return geometry.getGeometry();
+        }
+        
+        void updateGeometry(Prism3D& updatedGeometry) {
+            geometry.updateGeometry(updatedGeometry);
+        }
         
     private:
         Level& level;
-        Segment& seg;
+        std::vector<SegmentFace> faces;
+        LevelPrism geometry;
+        int id;
     };
-
-
-    class FaceEditor {
-    public:
-        FaceEditor(SegmentEditor& segEditor_, int faceId_);
-        
-    private:
-        SegmentEditor segEditor;
-        int faceId;
-    };
-
-
+    
     class Level {
     public:
-        SegmentEditor getEditorForSegment(int segId);
-        FaceEditor getEditorForFace(int segId, int faceId);
+        Segment& addSegment(Prism3D& geometry) {
+            LevelPrism prism = vertexManager.addLevelPrism(geometry);
+            
+            Segment* newSegment = new Segment(*this, prism, segments.size());
+            segments.push_back(newSegment);
+            
+            return *newSegment;
+        }
+        
+        Segment& getSegment(int id) const {
+            return *segments[id];
+        }
+        
+        std::vector<Segment*> getAllSegments() const {
+            return segments;
+        }
         
     private:
-        Segment& getSegment(int segId) {
-            return *segments[segId];
-        }
-        
-        int addVertex(Vertex v) {
-            if(vertexMap.count(v) != 0)
-                return vertexMap[v];
-            
-            int newVertexId = vertices.size();
-            
-            vertices.push_back(v);
-            vertexMap[v] = newVertexId;
-            
-            return newVertexId;
-        }
-        
+        VertexManager vertexManager;
         std::vector<Segment*> segments;
-        std::vector<Vertex> vertices;
-        std::map<Vertex, int> vertexMap;
     };
-
 }
+

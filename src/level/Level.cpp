@@ -16,21 +16,8 @@
 #include "Level.hpp"
 
 namespace Level {
-    
-    SegmentEditor::SegmentEditor(Level& level_, Segment& seg_) : level(level_), seg(seg_) { }
-
-    FaceEditor SegmentEditor::getEditorForFace(int faceId) {
-        return FaceEditor(*this, faceId);
-    }
-
-    FaceEditor::FaceEditor(SegmentEditor& segEditor_, int faceId_) : segEditor(segEditor_), faceId(faceId_) { }
-
-    SegmentEditor Level::getEditorForSegment(int segId) {
-        return SegmentEditor(*this, getSegment(segId));
-    }
-
-    FaceEditor Level::getEditorForFace(int segId, int faceId) {
-        return getEditorForSegment(segId).getEditorForFace(faceId);
+    Polygon3D SegmentFace::getGeometry() const {
+        return seg.getGeometry().getFace(id);
     }
 
 }

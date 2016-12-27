@@ -25,6 +25,7 @@ struct Vec3 {
     
      Vec3(float x_, float y_, float z_) : x(x_), y(y_), z(z_) { }
      Vec3() : x(0), y(0), z(0) { }
+     Vec3(X3D_Vex3D& v) : x(v.x), y(v.y), z(v.z) { }
     
      Vec3 operator+(const Vec3& v) const {
         return Vec3(x + v.x, y + v.y, z + v.z);
@@ -94,7 +95,7 @@ struct Vec3 {
         return std::string(str);
     }
     
-    X3D_Vex3D toVex3D() const {
+    X3D_Vex3D toX3DVex3D() const {
         return x3d_vex3d_make(x, y, z);
     }
 };

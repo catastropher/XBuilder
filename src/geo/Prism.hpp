@@ -19,6 +19,13 @@
 #include "Polygon.hpp"
 
 struct Prism3D {
+    Prism3D() { }
+    Prism3D(std::vector<Vec3> vertices_) : vertices(vertices_) { }
+    Prism3D(X3D_Prism3D& prism) {
+        for(int i = 0; i < prism.base_v * 2; ++i)
+            vertices.push_back(Vec3(prism.v[i]));
+    }
+    
     enum {
         BASE_A = 0,
         BASE_B = 1
@@ -26,6 +33,10 @@ struct Prism3D {
     
     int baseVertices() const {
         return vertices.size() / 2;
+    }
+    
+    int totalVertices() const {
+        return vertices.size();
     }
     
     Polygon3D getFace(int faceId) const {
@@ -46,6 +57,17 @@ struct Prism3D {
             setBaseBReversed(poly);
         
         setSideFace(faceId, poly);
+    }
+    
+    Vec3 getVertex(int vertexId) {
+        return vertices[vertexId];
+    }
+    
+    void toX3DPrism3D(X3D_Prism3D* dest) {
+        dest->base_v = baseVertices();
+        
+        for(int i = 0; i < totalVertices(); ++i)
+            dest->v[i] = vertices[i].toX3DVex3D();
     }
     
 private:

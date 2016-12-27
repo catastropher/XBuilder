@@ -15,9 +15,12 @@
 
 #include <X3D/X3D.h>
 #include <SDL2/SDL.h>
+#include <vector>
 
 #include "level/Level.hpp"
 #include "tool.hpp"
+
+using namespace std;
 
 void init() {
     X3D_InitSettings init = {
@@ -44,17 +47,23 @@ void xbuilder_handle_keys(void);
 
 extern ToolManager* globalToolState;
 
-void renderAllSegments(X3D_Level* level, X3D_CameraObject* cam) {
+#include "level/Level.hpp"
+
+Level::Level globalLevel;
+
+void renderAllSegments(Level::Level& level, X3D_CameraObject* cam) {
     X3D_Vex3D v[32];
     X3D_Prism3D prism;
     prism.v = v;
     
     X3D_ColorIndex red = x3d_color_to_colorindex(x3d_rgb_to_color(255, 0, 0));
     
-    for(int16 i = 0; i < x3d_level_total_segs(level); ++i) {
-        X3D_LevelSegment* seg = x3d_level_get_segmentptr(level, i);
+    vector<Level::Segment*> levelSegments = level.getAllSegments();
+    
+    for(Level::Segment* seg : levelSegments) {
         
-        x3d_levelsegment_get_geometry(level, seg, &prism);
+        seg->getGeometry().toX3DPrism3D(&prism);
+    
         x3d_prism3d_render_wireframe(&prism, cam, red);
     }
 }
@@ -65,7 +74,7 @@ extern "C" void test_render_callback(X3D_CameraObject* cam) {
     
     //render_level(global_level, cam);
     
-    renderAllSegments(global_level, cam);
+    renderAllSegments(globalLevel, cam);
     globalToolState->renderLevel(cam);
 }
 
@@ -86,6 +95,17 @@ int main() {
     
     X3D_Level level;// = builder.buildX3DLevel();
     x3d_level_init(&level);
+    
+    X3D_Prism3D prism;
+    X3D_Vex3D v[32];
+    prism.v = v;
+    
+    X3D_Vex3D_angle256 angle = { 0, 0, 0 };
+    
+    x3d_prism3d_construct(&prism, 8, 400, 200, angle);
+    Prism3D p = Prism3D(prism);
+    
+    globalLevel.addSegment(p);
     
     init();
     
