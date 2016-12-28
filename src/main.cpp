@@ -58,10 +58,7 @@ void renderAllSegments(Level::Level& level, X3D_CameraObject* cam) {
     
     X3D_ColorIndex red = x3d_color_to_colorindex(x3d_rgb_to_color(255, 0, 0));
     
-    vector<Level::Segment*> levelSegments = level.getAllSegments();
-    
-    for(Level::Segment* seg : levelSegments) {
-        
+    for(Level::Level::SegmentIterator seg = level.segmentBegin(); seg != level.segmentEnd(); ++seg) {
         seg->getGeometry().toX3DPrism3D(&prism);
     
         x3d_prism3d_render_wireframe(&prism, cam, red);

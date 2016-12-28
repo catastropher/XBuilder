@@ -172,6 +172,67 @@ namespace Level {
     
     class Level {
     public:
+        class SegmentIterator {
+        public:
+            SegmentIterator(Segment** seg_, Segment** end_) : seg(seg_), end(end_)  {
+                if(shouldSkipDeletedSegment(seg))
+                    *this = next();
+            }
+            
+            SegmentIterator next() const {
+                Segment** s = seg + 1;
+                
+                while(shouldSkipDeletedSegment(s))
+                    ++s;
+                
+                return SegmentIterator(s, end);
+            }
+            
+            SegmentIterator& operator=(const SegmentIterator& segIterator) {
+                seg = segIterator.seg;
+                end = segIterator.end;
+                return *this;
+            }
+            
+            bool operator==(const SegmentIterator& segIterator) const {
+                return seg == segIterator.seg;
+            }
+            
+            bool operator!=(const SegmentIterator& segIterator) const {
+                return !(*this == segIterator);
+            }
+            
+            SegmentIterator& operator++() {
+                *this = this->next();
+                return *this;
+            }
+            
+            Segment& operator*() const {
+                return **seg;
+            }
+            
+            Segment* operator->() const {
+                return *seg;
+            }
+            
+        private:
+            bool shouldSkipDeletedSegment(Segment** s) const {
+                return s < end && (*s)->isDeleted();
+            }
+            
+            Segment** seg;
+            Segment** end;
+        };
+        
+        SegmentIterator segmentBegin() {
+            return SegmentIterator(&segments[0], &segments[segments.size()]);
+        }
+        
+        SegmentIterator segmentEnd() {
+            return SegmentIterator(&segments[segments.size()], &segments[segments.size()]);
+        }
+        
+        
         Segment& addSegment(Prism3D& geometry) {
             LevelPrism prism = vertexManager.addLevelPrism(geometry);
             
@@ -183,10 +244,6 @@ namespace Level {
         
         Segment& getSegment(int id) const {
             return *segments[id];
-        }
-        
-        std::vector<Segment*> getAllSegments() const {
-            return segments;
         }
         
     private:
