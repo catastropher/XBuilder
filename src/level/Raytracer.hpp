@@ -19,9 +19,27 @@
 namespace Level {
     class Raytracer {
     public:
+        struct FaceIntersection {
+            PlaneIntersection intersection;
+            Segment* seg;
+            int faceId;
+            
+            FaceIntersection() : seg(nullptr) { }
+            FaceIntersection(PlaneIntersection& intersection_, Segment* seg_, int faceId_) : intersection(intersection_), seg(seg_), faceId(faceId_) { }
+            
+            bool operator<(const FaceIntersection& inter) const {
+                return intersection < inter.intersection;
+            }
+        };
+        
+        
         Raytracer(Level& level_, Ray ray_) : level(level_), ray(ray_) { }
         
+        bool findClosestIntersectedFace(FaceIntersection& result);
+        
     private:
+        FaceIntersection findClosestIntersectionForSegment(Segment& seg);
+        
         Level& level;
         Ray ray;
     };

@@ -13,33 +13,16 @@
 // You should have received a copy of the GNU General Public License
 // along with XBuilder. If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
-
-#include <vector>
-
-#include "Vec3.hpp"
+#include "Polygon.hpp"
 #include "Plane.hpp"
-#include "Ray.hpp"
+#include "Frustum.hpp"
 
-struct Polygon3D {
-    std::vector<Vec3> vertices;
+bool Polygon3D::rayIntersectsPolygon(Ray& ray, PlaneIntersection& result) {
+    Plane plane = calculatePlane();
     
-    Polygon3D() { }
-    Polygon3D(int totalVertices_) : vertices(totalVertices_) { }
-    Polygon3D(std::vector<Vec3>& v) : vertices(v) { }
+    if(!plane.rayIntersectsPolygon(ray, result))
+        return false;
     
-    void addPoint(Vec3 v) {
-        vertices.push_back(v);
-    }
-    
-    int totalVertices() {
-        return vertices.size();
-    }
-    
-    Plane calculatePlane() const {
-        return Plane(vertices[0], vertices[1], vertices[2]);
-    }
-    
-    bool rayIntersectsPolygon(Ray& ray, PlaneIntersection& result);
-};
+    return Frustum::constructFromPointAndPolygon(ray.v[0], *this).pointIsInsideOf(result.intersection);
+}
 

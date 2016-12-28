@@ -17,29 +17,34 @@
 
 #include <vector>
 
-#include "Vec3.hpp"
 #include "Plane.hpp"
-#include "Ray.hpp"
+#include "Polygon.hpp"
 
-struct Polygon3D {
-    std::vector<Vec3> vertices;
+struct Frustum {
+    std::vector<Plane> planes;
     
-    Polygon3D() { }
-    Polygon3D(int totalVertices_) : vertices(totalVertices_) { }
-    Polygon3D(std::vector<Vec3>& v) : vertices(v) { }
-    
-    void addPoint(Vec3 v) {
-        vertices.push_back(v);
+    void addPlane(Plane p) {
+        planes.push_back(p);
     }
     
-    int totalVertices() {
-        return vertices.size();
+    static Frustum constructFromPointAndPolygon(Vec3 point, Polygon3D& poly) {
+        Frustum f;
+        
+        for(int i = 0; i < poly.totalVertices(); ++i) {
+            int nextVertex = (i + 1) % poly.totalVertices();
+            f.addPlane(Plane(point, poly.vertices[nextVertex], poly.vertices[i]));
+        }
+        
+        return f;
     }
     
-    Plane calculatePlane() const {
-        return Plane(vertices[0], vertices[1], vertices[2]);
+    bool pointIsInsideOf(Vec3 point) {
+        for(int i = 0; i < (int)planes.size(); ++i) {
+            if(!planes[i].pointIsOnNormalFacingSide(point))
+                return false;
+        }
+        
+        return true;
     }
-    
-    bool rayIntersectsPolygon(Ray& ray, PlaneIntersection& result);
 };
 

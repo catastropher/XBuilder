@@ -18,29 +18,27 @@
 #include "Vec3.hpp"
 #include "Ray.hpp"
 
+struct PlaneIntersection {
+    Vec3 intersection;
+    float t;
+    
+    PlaneIntersection() : t(100000000) { }
+    
+    bool operator<(const PlaneIntersection& inter) const {
+        return t < inter.t;
+    }
+};
+
 struct Plane {
     Vec3 normal;
     float d;
     
-    bool calculateRayIntersection(const Ray& ray, Vec3& intersectDest) const {
-        float den = ray.dir.dot(normal);
+    Plane(Vec3 p1, Vec3 p2, Vec3 p3) {        
+        Vec3 u = p1 - p2;
+        Vec3 v = p3 - p2;
         
-        if(den == 0)
-            return false;
-        
-        float t = -(ray.v[0].dot(normal) + d) / den;
-        
-        if(t < 0)
-            return false;
-        
-        intersectDest = ray.v[0] + ray.dir * t;
-        
-        return true;
-    }
-    
-    Plane(const Vec3& p, const Vec3& u, const Vec3& v) {
         normal = u.cross(v).normalize();
-        d = -p.dot(normal);
+        d = -p1.dot(normal);
     }
     
     Plane(float a, float b, float c, float d_) {
@@ -51,5 +49,29 @@ struct Plane {
     }
     
     Plane() { }
+    
+    bool rayIntersectsPolygon(const Ray& ray, PlaneIntersection& result) const {
+        float den = ray.dir.dot(normal);
+        
+        if(den == 0)
+            return false;
+        
+        result.t = -(ray.v[0].dot(normal) + d) / den;
+        
+        if(result.t < 0)
+            return false;
+        
+        result.intersection = ray.v[0] + ray.dir * result.t;
+        
+        return true;
+    }
+    
+    float pointDistance(Vec3 point) const {
+        return normal.dot(point) + d;
+    }
+    
+    bool pointIsOnNormalFacingSide(Vec3 point) const {
+        return pointDistance(point) < 0;
+    }
 };
 

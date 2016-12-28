@@ -39,6 +39,10 @@ struct Prism3D {
         return vertices.size();
     }
     
+    int totalFaces() const {
+        return baseVertices() + 2;
+    }
+    
     Polygon3D getFace(int faceId) const {
         if(faceId == BASE_A)
             return getFace(faceId);
