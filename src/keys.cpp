@@ -134,7 +134,7 @@ void xbuilder_handle_keys(void) {
     handle_movement_keys(cam);
     xbuilder_handler_record();
     
-    globalToolState->handleKeys();
+    //globalToolState->handleKeys();
     
     //MouseState mouseState = MouseState::getCurrentMouseState();
     //globalToolState->handleMouse(mouseState);

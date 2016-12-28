@@ -163,6 +163,8 @@ void setupWindow() {
 
 #include "pack/DirectoryScanner.hpp"
 
+#include "tool.hpp"
+
 void initGUI() {
     setupWindow();
     
@@ -184,6 +186,8 @@ void initGUI() {
     
     X3DRenderWindow x3dWindow;
     
+    ToolManager toolManager;
+    
     while(!done) {
         SDL_Event event;
         while (SDL_PollEvent(&event))
@@ -200,7 +204,9 @@ void initGUI() {
         bool show_another_window;
         ImGui::Begin("Another Window", &show_another_window);
         
-        picker.render();
+        toolManager.renderToolWindow();
+        
+        //picker.render();
         
 //         ImGui::Text("Hello");
 //         ImGui::InputText("Extrude Distance", test, 256);

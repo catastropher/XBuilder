@@ -20,5 +20,21 @@ namespace Level {
         return seg.getGeometry().getFace(id);
     }
 
+    Segment& Segment::operator=(const Segment& seg) {
+        level = seg.level;
+        faces = seg.faces;
+        geometry = seg.geometry;
+        id = seg.id;
+        deleted = seg.deleted;
+        
+        return *this;
+    }
+    
+    SegmentFace& SegmentFace::operator=(const SegmentFace& face) {
+        seg = face.seg;
+        id = face.id;
+        
+        return *this;
+    }
 }
 

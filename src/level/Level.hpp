@@ -121,6 +121,7 @@ namespace Level {
         SegmentFace(Segment& seg_, int id_) : seg(seg_), id(id_) { }
         
         Polygon3D getGeometry() const;
+        SegmentFace& operator=(const SegmentFace& face);
         
     private:
         Segment& seg;
@@ -129,7 +130,8 @@ namespace Level {
     
     class Segment {
     public:
-        Segment(Level& level_, LevelPrism& geometry_, int id_) : level(level_), geometry(geometry_), id(id_) {
+        Segment(const Segment& seg) = default;
+        Segment(Level& level_, LevelPrism& geometry_, int id_) : level(level_), geometry(geometry_), id(id_), deleted(false) {
             for(int i = 0; i < geometry_.totalFaces(); ++i)
                 faces.push_back(SegmentFace(*this, i));
         }
@@ -142,11 +144,30 @@ namespace Level {
             geometry.updateGeometry(updatedGeometry);
         }
         
+        bool isDeleted() const {
+            return deleted;
+        }
+        
+        void deleteSelf() {
+            deleted = true;
+        }
+        
+        void undeleteSelf() {
+            deleted = false;
+        }
+        
+        Level& getLevel() const {
+            return level;
+        }
+        
+        Segment& operator=(const Segment& seg);
+        
     private:
         Level& level;
         std::vector<SegmentFace> faces;
         LevelPrism geometry;
         int id;
+        bool deleted;
     };
     
     class Level {
