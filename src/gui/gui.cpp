@@ -23,7 +23,7 @@
 #include <GLES3/gl3.h>
 #include <vector>
 
-#include "gui/FaceTool.hpp"
+#include "gui/tools/tools.hpp"
 
 SDL_Window* window;
 SDL_GLContext glcontext;

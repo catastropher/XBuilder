@@ -47,7 +47,7 @@ struct DropDownWidget {
     std::vector<const char*> buildDropDownNames() {
         std::vector<const char*> dropDownNames;
         
-        for(int i = 0; i < items.size(); ++i)
+        for(int i = 0; i < (int)items.size(); ++i)
             dropDownNames.push_back(&items[i].displayName[0]);
         
         return dropDownNames;

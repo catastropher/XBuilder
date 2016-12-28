@@ -13,20 +13,11 @@
 // You should have received a copy of the GNU General Public License
 // along with XBuilder. If not, see <http://www.gnu.org/licenses/>.
 
-#include <X3D/X3D.h>
+#pragma once
 
-#include "Tool.hpp"
 #include "FaceTool.hpp"
 
-#include "render.hpp"
-
-void ToolManager::setSelectedToolGroup(std::string name) {
-    if(selectedToolGroup)
-        delete selectedToolGroup;
+struct ExtrudeFaceTool : FaceTool {
     
-    if(name == "face")
-        selectedToolGroup = new FaceToolGroup();
-    else
-        selectedToolGroup = nullptr;
-}
+};
 

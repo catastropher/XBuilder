@@ -11,7 +11,7 @@ add_executable(XBuilder
   src/keys.cpp
   src/texture.cpp
   
-  src/gui/Tool.cpp
+  src/gui/tools/ToolManager.cpp
   
   src/pack/DirectoryScanner.cpp
   src/pack/ResourcePack.cpp

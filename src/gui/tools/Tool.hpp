@@ -21,7 +21,7 @@
 #include "level/Level.hpp"
 
 #include "imgui/imgui.h"
-#include "widgets.hpp"
+#include "gui/widgets.hpp"
 
 struct MouseState {
     bool leftPressed;
@@ -51,32 +51,4 @@ struct ToolGroup {
     }
 };
 
-struct ToolManager {
-    ToolGroup* selectedToolGroup;
-    DropDownWidget toolGroupDropdown;
-    
-    ToolManager() : selectedToolGroup(nullptr), toolGroupDropdown("Tool Group") {
-        toolGroupDropdown.addItem("face", "Face");
-        toolGroupDropdown.addItem("segment", "Segment");
-        toolGroupDropdown.addItem("edge", "Edge");
-    }
-    
-    void setSelectedToolGroup(std::string name);
-    
-    void renderToolWindow() {
-        ImGui::Begin("Tools");
-        toolGroupDropdown.renderDropDown();
-        
-        if(toolGroupDropdown.valueChanged()) {
-            setSelectedToolGroup(toolGroupDropdown.getSelectedValue());
-        }
-        
-        if(selectedToolGroup) {
-            ImGui::Separator();
-            selectedToolGroup->renderToolDropDown();
-        }
-        
-        ImGui::End();
-    }
-};
 

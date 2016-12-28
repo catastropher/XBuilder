@@ -15,35 +15,5 @@
 
 #pragma once
 
-#include <X3D/X3D.h>
-#include <iostream>
-#include <string>
-
-#include "level/Level.hpp"
-#include "gui/widgets.hpp"
-#include "gui/Tool.hpp"
-
-struct SelectedFace {
-    Level::Segment& seg;
-    int faceId;
-};
-
-struct FaceTool : Tool {
-    SelectedFace selectedFace;
-    
-    virtual void updateSelectedFace() { }
-};
-
-struct ExtrudeFaceTool : FaceTool {
-    
-};
-
-struct FaceToolGroup : ToolGroup {
-    FaceToolGroup() {
-        toolDropDown.addItem("extrude", "Extrude");
-        toolDropDown.addItem("scale", "Scale");
-        toolDropDown.addItem("connect", "Connect");
-    }
-};
-
-
+#include "FaceTool.hpp"
+#include "ExtrudeFaceTool.hpp"
