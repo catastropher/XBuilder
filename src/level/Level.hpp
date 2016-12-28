@@ -167,6 +167,11 @@ namespace Level {
             return *faces[faceId];
         }
         
+        ~Segment() {
+            for(int i = 0; i < (int)geometry.totalFaces(); ++i)
+                delete faces[i];
+        }
+        
     private:
         Level& level;
         std::vector<SegmentFace*> faces;
@@ -249,6 +254,11 @@ namespace Level {
         
         Segment& getSegment(int id) const {
             return *segments[id];
+        }
+        
+        ~Level() {
+            for(int i = 0; i < (int)segments.size(); ++i)
+                delete segments[i];
         }
         
     private:

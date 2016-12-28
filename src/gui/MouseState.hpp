@@ -15,20 +15,17 @@
 
 #pragma once
 
-#include "imgui/imgui.h"
-#include "FaceTool.hpp"
+#include <X3D/X3D.h>
 
-struct ExtrudeFaceTool : FaceTool {
-    float extrudeAmount;
+struct MouseState {
+    bool leftPressed;
+    bool rightPressed;
+    X3D_Vex2D pos;
+    bool hoverInWindow;
     
-    ExtrudeFaceTool(Level::Level& level_) : FaceTool(level_), extrudeAmount(100) { }
-    
-    void renderToolWindow() {
-        ImGui::InputFloat("Extrude Amount", &extrudeAmount);
+    MouseState(bool leftPressed_, bool rightPressed_, X3D_Vex2D pos_, bool hoverInWindow_) :
+        leftPressed(leftPressed_), rightPressed(rightPressed_), pos(pos_), hoverInWindow(hoverInWindow_) { }
         
-        if(ImGui::Button("Extrude!")) {
-            selectedFace.seg->getFace(selectedFace.faceId).extrude(extrudeAmount);
-        }
-    }
+    MouseState() : leftPressed(false), rightPressed(false), pos({ 0, 0 }), hoverInWindow(false) { }
 };
 

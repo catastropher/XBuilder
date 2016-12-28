@@ -13,12 +13,22 @@
 // You should have received a copy of the GNU General Public License
 // along with XBuilder. If not, see <http://www.gnu.org/licenses/>.
 
+#pragma once
 
-#include "facetools.hpp"
+#include "imgui/imgui.h"
+#include "FaceTool.hpp"
 
-void FaceToolGroup::setSelectedTool(std::string name) {
-    if(name == "extrude")
-        selectedTool = new ExtrudeFaceTool(level);
-    else
-        selectedTool = nullptr;
-}
+struct ExtrudeFaceTool : FaceTool {
+    float extrudeAmount;
+    
+    ExtrudeFaceTool(ToolContext& context_) : FaceTool(context_), extrudeAmount(100) { }
+    
+    void renderToolWindow() {
+        ImGui::InputFloat("Extrude Amount", &extrudeAmount);
+        
+        if(ImGui::Button("Extrude!")) {
+            selectedFace.seg->getFace(selectedFace.faceId).extrude(extrudeAmount);
+        }
+    }
+};
+

@@ -16,9 +16,9 @@
 #include <X3D/X3D.h>
 #include <SDL2/SDL.h>
 
-#include "gui/tools/tools.hpp"
+//#include "gui/tools/tools.hpp"
 
-ToolManager* globalToolState;
+//ToolManager* globalToolState;
 
 void handle_movement_keys(X3D_CameraObject* cam) {
     if(x3d_pc_key_down(SDLK_ESCAPE)) {

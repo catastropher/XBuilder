@@ -21,26 +21,26 @@
 
 #include "level/Level.hpp"
 #include "gui/widgets.hpp"
-#include "gui/tools/Tool.hpp"
+#include "../Tool.hpp"
 #include "level/Raytracer.hpp"
 
 struct FaceTool : Tool {
     Level::Raytracer::FaceIntersection selectedFace;
     bool requireSelectedFace;
     
-    FaceTool(Level::Level& level_, bool requireSelectedFace_ = true) : Tool(level_), requireSelectedFace(requireSelectedFace_) { }
+    FaceTool(ToolContext& context_, bool requireSelectedFace_ = true) : Tool(context_), requireSelectedFace(requireSelectedFace_) { }
     
     virtual void updateSelectedFace() { }
     
     virtual void viewWindowHandleMouse(MouseState& state) {
         X3D_CameraObject* viewCamera = x3d_playermanager_get()->player[0].cam;
         
-        Level::Raytracer raytracer(level, viewCamera, state.pos);
-        
-        if(raytracer.findClosestIntersectedFace(selectedFace))
-            printf("Hit!\n");
-        
-        updateSelectedFace();
+        if(state.leftPressed) {
+            Level::Raytracer raytracer(context.level, viewCamera, state.pos);
+            
+            if(raytracer.findClosestIntersectedFace(selectedFace))
+                updateSelectedFace();
+        }
     }
     
     bool faceIsSelected() const {
@@ -49,7 +49,7 @@ struct FaceTool : Tool {
 };
 
 struct FaceToolGroup : ToolGroup {
-    FaceToolGroup(Level::Level& level_) : ToolGroup(level_) {
+    FaceToolGroup(ToolContext& context_) : ToolGroup(context_) {
         toolDropDown.addItem("extrude", "Extrude");
         toolDropDown.addItem("scale", "Scale");
         toolDropDown.addItem("connect", "Connect");

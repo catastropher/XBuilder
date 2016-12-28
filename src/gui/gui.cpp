@@ -23,7 +23,7 @@
 #include <GLES3/gl3.h>
 #include <vector>
 
-#include "gui/tools/tools.hpp"
+#include "gui/gui.hpp"
 #include "level/Raytracer.hpp"
 
 SDL_Window* window;
@@ -37,65 +37,7 @@ extern Level::Level globalLevel;
 
 ToolManager* globalToolManager;
 
-class X3DRenderWindow {
-private:
-    GLuint renderTextureId;
-    
-public:
-    X3DRenderWindow() {
-        X3D_Texture tex = createTextureForRenderOuput();
-        renderTextureId = OpenGLTextureManager::addX3DTexture(&tex);
-    }
-    
-    void render() {
-        X3D_CameraObject* cam = x3d_playermanager_get()->player[0].cam;
-        x3d_read_keys();
-        x3d_screen_clear(0);
-        test_render_callback(cam);
-        x3d_keymanager_get()->key_handler();
-        updateRenderOutputTexture();
-        
-        ImGui::SetNextWindowSize(ImVec2(640, 480), ImGuiSetCond_Always);
-        bool show_another_window = true;
-        ImGui::Begin("X3D", &show_another_window, ImVec2(640, 480), -1.0f);
-        
-        X3D_Texture tex = createTextureForRenderOuput();
-        ImGui::Image((void*)(size_t)renderTextureId, ImVec2(tex.w, tex.h));
-        
-        if(ImGui::IsItemClicked()) {
-            ImVec2 mousePos = ImGui::GetMousePos();
-            ImVec2 windowPos = ImGui::GetWindowPos();
-            ImVec2 relativePos = ImVec2(mousePos.x - windowPos.x, mousePos.y - windowPos.y);
-            
-            printf("Clicked %f %f!\n", relativePos.x, relativePos.y);
-            
-            X3D_Vex2D pos = { (int)relativePos.x - 10, (int)relativePos.y - 30 };
-            
-            MouseState state(true, false, pos, true);
-            globalToolManager->viewWindowHandleMouse(state);
-            
-        }
-        
-        ImGui::End();
-    }
-    
-private:
-    X3D_Texture createTextureForRenderOuput() {
-        X3D_ScreenManager* screenman = x3d_screenmanager_get();
-        X3D_Texture tex;
-        
-        tex.texels = screenman->buf;
-        tex.w = screenman->w;
-        tex.h = screenman->h;
-        
-        return tex;
-    }
-    
-    void updateRenderOutputTexture() {
-        X3D_Texture tex = createTextureForRenderOuput();
-        OpenGLTextureManager::updateX3DTexture(renderTextureId, &tex);
-    }
-};
+
 
 struct TexturePicker {
     vector<LevelTexture*> textures;
@@ -196,11 +138,8 @@ void initGUI() {
     
     TexturePicker picker(TextureManager::getTextures());
     
-    X3DRenderWindow x3dWindow;
-    
-    ToolManager toolManager(globalLevel);
-    globalToolManager = &toolManager;
-    
+    GuiManager guiManager(globalLevel);
+
     while(!done) {
         SDL_Event event;
         while (SDL_PollEvent(&event))
@@ -217,9 +156,9 @@ void initGUI() {
 //         bool show_another_window;
 //         ImGui::Begin("Another Window", &show_another_window);
         
-        toolManager.renderToolWindow();
-        
         //picker.render();
+        
+        guiManager.render();
         
 //         ImGui::Text("Hello");
 //         ImGui::InputText("Extrude Distance", test, 256);
@@ -232,7 +171,7 @@ void initGUI() {
         
        // ImGui::End();
         
-        x3dWindow.render();
+        
         
         // Rendering
         glViewport(0, 0, (int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y);

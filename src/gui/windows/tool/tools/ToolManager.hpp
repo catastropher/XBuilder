@@ -20,9 +20,9 @@
 struct ToolManager {
     ToolGroup* selectedToolGroup;
     DropDownWidget toolGroupDropdown;
-    Level::Level& level;
+    ToolContext context;
     
-    ToolManager(Level::Level& level_) : selectedToolGroup(nullptr), toolGroupDropdown("Tool Group"), level(level_) {
+    ToolManager(WindowContext windowContext) : selectedToolGroup(nullptr), toolGroupDropdown("Tool Group"), context(windowContext) {
         toolGroupDropdown.addItem("face", "Face");
         toolGroupDropdown.addItem("segment", "Segment");
         toolGroupDropdown.addItem("edge", "Edge");
@@ -52,5 +52,10 @@ struct ToolManager {
     }
     
     void viewWindowHandleKeys() { }
+    
+    virtual ~ToolManager() {
+        if(selectedToolGroup)
+            delete selectedToolGroup;
+    }
 };
-
+    

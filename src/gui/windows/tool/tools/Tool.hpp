@@ -22,25 +22,26 @@
 
 #include "imgui/imgui.h"
 #include "gui/widgets.hpp"
+#include "gui/MouseState.hpp"
 
-struct MouseState {
-    bool leftPressed;
-    bool rightPressed;
-    X3D_Vex2D pos;
-    bool hoverInWindow;
+#include "gui/windows/Window.hpp"
+
+struct ToolContext {
+    Level::Level& level;
     
-    MouseState(bool leftPressed_, bool rightPressed_, X3D_Vex2D pos_, bool hoverInWindow_) :
-        leftPressed(leftPressed_), rightPressed(rightPressed_), pos(pos_), hoverInWindow(hoverInWindow_) { }
+    ToolContext(WindowContext& context) : level(context.level) { }
 };
 
 struct Tool {
-    Level::Level& level;
+    ToolContext& context;
     
-    Tool(Level::Level& level_) : level(level_) { }
+    Tool(ToolContext& context_) : context(context_) { }
     
     virtual void viewWindowHandleMouse(MouseState& state) { }
     virtual void viewWindowHandleKeys() { }
     virtual void renderToolWindow() { }
+    
+    virtual ~Tool() { }
 };
 
 
@@ -48,9 +49,9 @@ struct Tool {
 struct ToolGroup {
     DropDownWidget toolDropDown;
     Tool* selectedTool;
-    Level::Level& level;
+    ToolContext& context;
     
-    ToolGroup(Level::Level& level_) : toolDropDown("Tool"), selectedTool(nullptr), level(level_) { }
+    ToolGroup(ToolContext& context_) : toolDropDown("Tool"), selectedTool(nullptr), context(context_) { }
     
     void renderToolDropDown() {
         toolDropDown.renderDropDown();
@@ -73,7 +74,10 @@ struct ToolGroup {
             selectedTool->renderToolWindow();
     }
     
-    virtual ~ToolGroup() { }
+    virtual ~ToolGroup() {
+        if(selectedTool)
+            delete selectedTool;
+    }
 };
 
 

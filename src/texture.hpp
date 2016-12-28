@@ -80,6 +80,11 @@ class TextureManager {
 private:
     static std::vector<LevelTexture*> textures;
     
+    ~TextureManager() {
+        for(int i = 0; i < (int)textures.size(); ++i)
+            delete textures[i];
+    }
+    
 public:
     static LevelTexture* loadTexture(std::string fileName);
     static LevelTexture* addTexture(X3D_Texture tex, std::string fileName);

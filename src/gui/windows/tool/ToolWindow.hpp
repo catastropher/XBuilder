@@ -13,18 +13,21 @@
 // You should have received a copy of the GNU General Public License
 // along with XBuilder. If not, see <http://www.gnu.org/licenses/>.
 
-#include <X3D/X3D.h>
+#include "../Window.hpp"
+#include "tools/tools.hpp"
 
-#include "tools.hpp"
-
-
-void ToolManager::setSelectedToolGroup(std::string name) {
-    if(selectedToolGroup)
-        delete selectedToolGroup;
+class ToolWindow : Window {
+public:
+    ToolWindow(WindowContext& context_) : Window(context_), toolManager(context_) { }
     
-    if(name == "face")
-        selectedToolGroup = new FaceToolGroup(level);
-    else
-        selectedToolGroup = nullptr;
-}
-
+    void render() {
+        toolManager.renderToolWindow();
+    }
+    
+    void handleMouse(MouseState mouseState) {
+        toolManager.viewWindowHandleMouse(mouseState);
+    }
+    
+private:
+    ToolManager toolManager;
+};

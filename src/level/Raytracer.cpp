@@ -22,10 +22,8 @@ namespace Level {
     bool Raytracer::findClosestIntersectedFace(Raytracer::FaceIntersection& result) {
         FaceIntersection closestIntersection;
         
-        for(Level::SegmentIterator seg = level.segmentBegin(); seg != level.segmentEnd(); ++seg) {
-            printf("\tVisit seg\n");
+        for(Level::SegmentIterator seg = level.segmentBegin(); seg != level.segmentEnd(); ++seg)
             closestIntersection = std::min(closestIntersection, findClosestIntersectionForSegment(*seg));
-        }
         
         result = closestIntersection;
         
@@ -40,10 +38,8 @@ namespace Level {
             Polygon3D face = geometry.getFace(i);
             PlaneIntersection planeIntersection;
             
-            if(face.rayIntersectsPolygon(ray, planeIntersection)) {
-                printf("HitX! %f\n", planeIntersection.t);
+            if(face.rayIntersectsPolygon(ray, planeIntersection))
                 closestIntersection = std::min(closestIntersection, FaceIntersection(planeIntersection, &seg, i));
-            }
         }
         
         return closestIntersection;

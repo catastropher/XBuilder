@@ -18,7 +18,7 @@
 #include <vector>
 
 #include "level/Level.hpp"
-#include "gui/tools/tools.hpp"
+#include "gui/gui.hpp"
 
 using namespace std;
 
@@ -45,7 +45,7 @@ int16 creation_plane_y;
 
 void xbuilder_handle_keys(void);
 
-extern ToolManager* globalToolState;
+//extern ToolManager* globalToolState;
 
 #include "level/Level.hpp"
 
