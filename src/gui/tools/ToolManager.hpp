@@ -20,8 +20,9 @@
 struct ToolManager {
     ToolGroup* selectedToolGroup;
     DropDownWidget toolGroupDropdown;
+    Level::Level& level;
     
-    ToolManager() : selectedToolGroup(nullptr), toolGroupDropdown("Tool Group") {
+    ToolManager(Level::Level& level_) : selectedToolGroup(nullptr), toolGroupDropdown("Tool Group"), level(level_) {
         toolGroupDropdown.addItem("face", "Face");
         toolGroupDropdown.addItem("segment", "Segment");
         toolGroupDropdown.addItem("edge", "Edge");
@@ -40,8 +41,17 @@ struct ToolManager {
         if(selectedToolGroup) {
             ImGui::Separator();
             selectedToolGroup->renderToolDropDown();
+            selectedToolGroup->renderToolWindow();
         }
         
         ImGui::End();
     }
+    
+    void viewWindowHandleMouse(MouseState& state) {
+        if(selectedToolGroup)
+            selectedToolGroup->viewWindowHandleMouse(state);
+    }
+    
+    void viewWindowHandleKeys() { }
 };
+

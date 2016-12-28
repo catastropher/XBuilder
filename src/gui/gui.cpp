@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "gui/tools/tools.hpp"
+#include "level/Raytracer.hpp"
 
 SDL_Window* window;
 SDL_GLContext glcontext;
@@ -31,6 +32,10 @@ SDL_GLContext glcontext;
 using namespace std;
 
 extern "C" void test_render_callback(X3D_CameraObject* cam);
+
+extern Level::Level globalLevel;
+
+ToolManager* globalToolManager;
 
 class X3DRenderWindow {
 private:
@@ -43,9 +48,10 @@ public:
     }
     
     void render() {
+        X3D_CameraObject* cam = x3d_playermanager_get()->player[0].cam;
         x3d_read_keys();
         x3d_screen_clear(0);
-        test_render_callback(x3d_playermanager_get()->player[0].cam);
+        test_render_callback(cam);
         x3d_keymanager_get()->key_handler();
         updateRenderOutputTexture();
         
@@ -62,6 +68,12 @@ public:
             ImVec2 relativePos = ImVec2(mousePos.x - windowPos.x, mousePos.y - windowPos.y);
             
             printf("Clicked %f %f!\n", relativePos.x, relativePos.y);
+            
+            X3D_Vex2D pos = { (int)relativePos.x, (int)relativePos.y };
+            
+            MouseState state(true, false, pos, true);
+            globalToolManager->viewWindowHandleMouse(state);
+            
         }
         
         ImGui::End();
@@ -186,7 +198,8 @@ void initGUI() {
     
     X3DRenderWindow x3dWindow;
     
-    ToolManager toolManager;
+    ToolManager toolManager(globalLevel);
+    globalToolManager = &toolManager;
     
     while(!done) {
         SDL_Event event;

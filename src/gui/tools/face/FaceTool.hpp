@@ -22,24 +22,35 @@
 #include "level/Level.hpp"
 #include "gui/widgets.hpp"
 #include "gui/tools/Tool.hpp"
-
-struct SelectedFace {
-    Level::Segment& seg;
-    int faceId;
-};
+#include "level/Raytracer.hpp"
 
 struct FaceTool : Tool {
-    SelectedFace selectedFace;
+    Level::Raytracer::FaceIntersection selectedFace;
+    
+    FaceTool(Level::Level& level_) : Tool(level_) { }
     
     virtual void updateSelectedFace() { }
+    
+    virtual void viewWindowHandleMouse(MouseState& state) {
+        X3D_CameraObject* viewCamera = x3d_playermanager_get()->player[0].cam;
+        
+        Level::Raytracer raytracer(level, viewCamera, state.pos);
+        
+        if(raytracer.findClosestIntersectedFace(selectedFace))
+            printf("Hit!\n");
+        
+        updateSelectedFace();
+    }
 };
 
 struct FaceToolGroup : ToolGroup {
-    FaceToolGroup() {
+    FaceToolGroup(Level::Level& level_) : ToolGroup(level_) {
         toolDropDown.addItem("extrude", "Extrude");
         toolDropDown.addItem("scale", "Scale");
         toolDropDown.addItem("connect", "Connect");
     }
+    
+    void setSelectedTool(std::string name);
 };
 
 

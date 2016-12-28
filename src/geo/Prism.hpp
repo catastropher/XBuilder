@@ -45,7 +45,7 @@ struct Prism3D {
     
     Polygon3D getFace(int faceId) const {
         if(faceId == BASE_A)
-            return getFace(faceId);
+            return getBaseA();
         
         if(faceId == BASE_B)
             return getBaseBReversed();

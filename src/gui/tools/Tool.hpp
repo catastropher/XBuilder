@@ -34,7 +34,11 @@ struct MouseState {
 };
 
 struct Tool {
-    virtual void viewWindowHandleMouse() { }
+    Level::Level level;
+    
+    Tool(Level::Level& level_) : level(level_) { }
+    
+    virtual void viewWindowHandleMouse(MouseState& state) { }
     virtual void viewWindowHandleKeys() { }
     virtual void renderToolWindow() { }
 };
@@ -43,12 +47,33 @@ struct Tool {
 
 struct ToolGroup {
     DropDownWidget toolDropDown;
+    Tool* selectedTool;
+    Level::Level& level;
     
-    ToolGroup() : toolDropDown("Tool") { }
+    ToolGroup(Level::Level& level_) : toolDropDown("Tool"), selectedTool(nullptr), level(level_) { }
     
     void renderToolDropDown() {
         toolDropDown.renderDropDown();
+        
+        if(toolDropDown.valueChanged())
+            setSelectedTool(toolDropDown.getSelectedValue());
     }
+    
+    virtual void viewWindowHandleMouse(MouseState& state) {
+        if(selectedTool)
+            selectedTool->viewWindowHandleMouse(state);
+    }
+    
+    virtual void setSelectedTool(std::string name) = 0;
+    
+    virtual void viewWindowHandleKeys() { }
+    
+    virtual void renderToolWindow() {
+        if(selectedTool)
+            selectedTool->renderToolWindow();
+    }
+    
+    virtual ~ToolGroup() { }
 };
 
 
