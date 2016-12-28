@@ -23,6 +23,8 @@
 #include <GLES3/gl3.h>
 #include <vector>
 
+#include "gui/FaceTool.hpp"
+
 SDL_Window* window;
 SDL_GLContext glcontext;
 
@@ -163,8 +165,6 @@ void setupWindow() {
 
 #include "pack/DirectoryScanner.hpp"
 
-#include "tool.hpp"
-
 void initGUI() {
     setupWindow();
     
@@ -200,9 +200,9 @@ void initGUI() {
         
         ImGui_ImplSdlGL3_NewFrame(window);
         
-        ImGui::SetNextWindowSize(ImVec2(200,100), ImGuiSetCond_FirstUseEver);
-        bool show_another_window;
-        ImGui::Begin("Another Window", &show_another_window);
+//         ImGui::SetNextWindowSize(ImVec2(200,100), ImGuiSetCond_FirstUseEver);
+//         bool show_another_window;
+//         ImGui::Begin("Another Window", &show_another_window);
         
         toolManager.renderToolWindow();
         
@@ -217,7 +217,7 @@ void initGUI() {
         
         //ImGui::EndChild();
         
-        ImGui::End();
+       // ImGui::End();
         
         x3dWindow.render();
         

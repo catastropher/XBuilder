@@ -16,7 +16,7 @@
 #include <X3D/X3D.h>
 #include <SDL2/SDL.h>
 
-#include "tool.hpp"
+#include "gui/Tool.hpp"
 
 ToolManager* globalToolState;
 

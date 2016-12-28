@@ -18,7 +18,7 @@
 #include <vector>
 
 #include "level/Level.hpp"
-#include "tool.hpp"
+#include "gui/Tool.hpp"
 
 using namespace std;
 

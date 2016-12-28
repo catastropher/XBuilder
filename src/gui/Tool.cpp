@@ -15,5 +15,18 @@
 
 #include <X3D/X3D.h>
 
-#include "tool.hpp"
+#include "Tool.hpp"
+#include "FaceTool.hpp"
+
 #include "render.hpp"
+
+void ToolManager::setSelectedToolGroup(std::string name) {
+    if(selectedToolGroup)
+        delete selectedToolGroup;
+    
+    if(name == "face")
+        selectedToolGroup = new FaceToolGroup();
+    else
+        selectedToolGroup = nullptr;
+}
+

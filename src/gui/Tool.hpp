@@ -21,6 +21,7 @@
 #include "level/Level.hpp"
 
 #include "imgui/imgui.h"
+#include "widgets.hpp"
 
 struct MouseState {
     bool leftPressed;
@@ -38,68 +39,7 @@ struct Tool {
     virtual void renderToolWindow() { }
 };
 
-struct SelectedFace {
-    Level::Segment& seg;
-    int faceId;
-};
 
-struct FaceTool : Tool {
-    SelectedFace selectedFace;
-    
-    virtual void updateSelectedFace() { }
-};
-
-struct ExtrudeFaceTool : FaceTool {
-    
-};
-
-struct DropDownItem {
-    std::string value;
-    std::string displayName;
-    
-    DropDownItem(std::string value_, std::string displayName_) : value(value_), displayName(displayName_) { }
-};
-
-struct DropDownWidget {
-    std::vector<DropDownItem> items;
-    int selectedItem;
-    int lastSelectedItem;
-    std::string labelText;
-    
-    DropDownWidget(std::string labelText_) : selectedItem(-1), lastSelectedItem(-1), labelText(labelText_) { }
-    
-    void addItem(std::string name, std::string displayName) {
-        items.push_back(DropDownItem(name, displayName));
-    }
-    
-    void renderDropDown() {
-        std::vector<const char*> dropDownNames = buildDropDownNames();
-        ImGui::Combo(labelText.c_str(), &selectedItem, &dropDownNames[0], dropDownNames.size());
-    }
-    
-    std::vector<const char*> buildDropDownNames() {
-        std::vector<const char*> dropDownNames;
-        
-        for(int i = 0; i < items.size(); ++i)
-            dropDownNames.push_back(&items[i].displayName[0]);
-        
-        return dropDownNames;
-    }
-    
-    std::string getSelectedValue() const {
-        if(selectedItem == -1)
-            return "";
-        
-        return items[selectedItem].value;
-    }
-    
-    bool valueChanged() {
-        bool changed = selectedItem != lastSelectedItem;
-        lastSelectedItem = selectedItem;
-        
-        return changed;
-    }
-};
 
 struct ToolGroup {
     DropDownWidget toolDropDown;
@@ -111,16 +51,8 @@ struct ToolGroup {
     }
 };
 
-struct FaceToolGroup : ToolGroup {
-    FaceToolGroup() {
-        toolDropDown.addItem("extrude", "Extrude");
-        toolDropDown.addItem("scale", "Scale");
-        toolDropDown.addItem("connect", "Connect");
-    }
-};
-
 struct ToolManager {
-    FaceToolGroup* selectedToolGroup;
+    ToolGroup* selectedToolGroup;
     DropDownWidget toolGroupDropdown;
     
     ToolManager() : selectedToolGroup(nullptr), toolGroupDropdown("Tool Group") {
@@ -129,15 +61,7 @@ struct ToolManager {
         toolGroupDropdown.addItem("edge", "Edge");
     }
     
-    void setSelectedToolGroup(std::string name) {
-        if(selectedToolGroup)
-            delete selectedToolGroup;
-        
-        if(name == "face")
-            selectedToolGroup = new FaceToolGroup();
-        else
-            selectedToolGroup = nullptr;
-    }
+    void setSelectedToolGroup(std::string name);
     
     void renderToolWindow() {
         ImGui::Begin("Tools");

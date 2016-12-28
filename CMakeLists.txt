@@ -9,8 +9,9 @@ add_executable(XBuilder
   src/main.cpp
   src/level/Level.cpp
   src/keys.cpp
-  src/tool.cpp
   src/texture.cpp
+  
+  src/gui/Tool.cpp
   
   src/pack/DirectoryScanner.cpp
   src/pack/ResourcePack.cpp
