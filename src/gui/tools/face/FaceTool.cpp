@@ -18,7 +18,7 @@
 
 void FaceToolGroup::setSelectedTool(std::string name) {
     if(name == "extrude")
-        selectedTool = new FaceTool(level);
+        selectedTool = new ExtrudeFaceTool(level);
     else
         selectedTool = nullptr;
 }

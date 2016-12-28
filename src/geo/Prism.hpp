@@ -26,6 +26,8 @@ struct Prism3D {
             vertices.push_back(Vec3(prism.v[i]));
     }
     
+    Prism3D(int baseVertices_) : vertices(baseVertices_ * 2) { }
+    
     enum {
         BASE_A = 0,
         BASE_B = 1
@@ -56,11 +58,10 @@ struct Prism3D {
     void setFace(int faceId, Polygon3D& poly) {
         if(faceId == BASE_A)
             setBaseA(poly);
-        
-        if(faceId == BASE_B)
+        else if(faceId == BASE_B)
             setBaseBReversed(poly);
-        
-        setSideFace(faceId, poly);
+        else
+            setSideFace(faceId, poly);
     }
     
     Vec3 getVertex(int vertexId) {

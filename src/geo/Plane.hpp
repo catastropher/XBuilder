@@ -73,5 +73,10 @@ struct Plane {
     bool pointIsOnNormalFacingSide(Vec3 point) const {
         return pointDistance(point) < 0;
     }
+    
+    void flipDirection() {
+        normal = normal.neg();
+        d = -d;
+    }
 };
 

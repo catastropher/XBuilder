@@ -51,7 +51,11 @@ struct Vec3 {
     
      Vec3 operator*(float f) const {
         return Vec3(x * f, y * f, z * f);
-    }
+     }
+     
+     Vec3 operator/(float f) const {
+         return Vec3(x / f, y / f, z / f);
+     }
     
      Vec3 cross(const Vec3& v) const {
         const Vec3& u = *this;

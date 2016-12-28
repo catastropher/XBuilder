@@ -34,7 +34,7 @@ struct MouseState {
 };
 
 struct Tool {
-    Level::Level level;
+    Level::Level& level;
     
     Tool(Level::Level& level_) : level(level_) { }
     

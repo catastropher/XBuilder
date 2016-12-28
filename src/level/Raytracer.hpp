@@ -32,6 +32,10 @@ namespace Level {
             bool operator<(const FaceIntersection& inter) const {
                 return intersection < inter.intersection;
             }
+            
+            bool validIntersection() const {
+                return seg != nullptr;
+            }
         };
         
         

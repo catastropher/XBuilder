@@ -69,7 +69,7 @@ public:
             
             printf("Clicked %f %f!\n", relativePos.x, relativePos.y);
             
-            X3D_Vex2D pos = { (int)relativePos.x, (int)relativePos.y };
+            X3D_Vex2D pos = { (int)relativePos.x - 10, (int)relativePos.y - 30 };
             
             MouseState state(true, false, pos, true);
             globalToolManager->viewWindowHandleMouse(state);
@@ -167,7 +167,7 @@ void setupWindow() {
     
     SDL_DisplayMode current;
     SDL_GetCurrentDisplayMode(0, &current);
-    window = SDL_CreateWindow("ImGui SDL2+OpenGL3 example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
+    window = SDL_CreateWindow("ImGui SDL2+OpenGL3 example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 768, SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
     glcontext = SDL_GL_CreateContext(window);
     
     SDL_GL_MakeCurrent(window, glcontext);

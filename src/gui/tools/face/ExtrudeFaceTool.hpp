@@ -15,9 +15,20 @@
 
 #pragma once
 
+#include "imgui/imgui.h"
 #include "FaceTool.hpp"
 
 struct ExtrudeFaceTool : FaceTool {
+    float extrudeAmount;
     
+    ExtrudeFaceTool(Level::Level& level_) : FaceTool(level_), extrudeAmount(100) { }
+    
+    void renderToolWindow() {
+        ImGui::InputFloat("Extrude Amount", &extrudeAmount);
+        
+        if(ImGui::Button("Extrude!")) {
+            selectedFace.seg->getFace(selectedFace.faceId).extrude(extrudeAmount);
+        }
+    }
 };
 

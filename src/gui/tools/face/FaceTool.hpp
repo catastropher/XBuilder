@@ -26,8 +26,9 @@
 
 struct FaceTool : Tool {
     Level::Raytracer::FaceIntersection selectedFace;
+    bool requireSelectedFace;
     
-    FaceTool(Level::Level& level_) : Tool(level_) { }
+    FaceTool(Level::Level& level_, bool requireSelectedFace_ = true) : Tool(level_), requireSelectedFace(requireSelectedFace_) { }
     
     virtual void updateSelectedFace() { }
     
@@ -41,6 +42,10 @@ struct FaceTool : Tool {
         
         updateSelectedFace();
     }
+    
+    bool faceIsSelected() const {
+        return selectedFace.validIntersection();
+    }
 };
 
 struct FaceToolGroup : ToolGroup {
@@ -51,6 +56,25 @@ struct FaceToolGroup : ToolGroup {
     }
     
     void setSelectedTool(std::string name);
+    
+    void renderToolWindow() {
+        if(!selectedTool)
+            return;
+        
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::Text("Face -> %s", toolDropDown.getSelectedDisplayName().c_str());
+        ImGui::Separator();
+        
+        if(FaceTool* tool = dynamic_cast<FaceTool*>(selectedTool)) {
+            if(tool->requireSelectedFace && !tool->faceIsSelected()) {
+                ImGui::Text("Please select a face :(");
+                return;
+            }
+        }
+        
+        ToolGroup::renderToolWindow();
+    }
 };
 
 

@@ -32,12 +32,35 @@ struct Polygon3D {
         vertices.push_back(v);
     }
     
-    int totalVertices() {
+    int totalVertices() const {
         return vertices.size();
     }
     
     Plane calculatePlane() const {
         return Plane(vertices[0], vertices[1], vertices[2]);
+    }
+    
+    void reverse() {
+        for(int i = 0; i < totalVertices() / 2; ++i)
+            std::swap(vertices[i], vertices[totalVertices() - i - 1]);
+    }
+    
+    void translate(Vec3 v) {
+        for(int i = 0; i < totalVertices(); ++i)
+            vertices[i] = vertices[i] + v;
+    }
+    
+    void translateAlongNormal(float dist) {
+        translate(calculatePlane().normal * dist);
+    }
+    
+    Vec3 center() const {
+        Vec3 center(0, 0, 0);
+        
+        for(int i = 0; i < totalVertices(); ++i)
+            center = center + vertices[i];
+        
+        return center / totalVertices();
     }
     
     bool rayIntersectsPolygon(Ray& ray, PlaneIntersection& result);

@@ -36,5 +36,20 @@ namespace Level {
         
         return *this;
     }
+    
+    Segment& SegmentFace::extrude(float dist) {
+        Polygon3D newBaseA = getGeometry();
+        newBaseA.reverse();
+        
+        Prism3D newGeometry(newBaseA.totalVertices());
+        newGeometry.setFace(Prism3D::BASE_A, newBaseA);
+        
+        Polygon3D newBaseB = getGeometry();
+        newBaseB.translateAlongNormal(-dist);
+        newGeometry.setFace(Prism3D::BASE_B, newBaseB);
+        
+        return seg.getLevel().addSegment(newGeometry);
+    }
+
 }
 

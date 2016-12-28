@@ -60,6 +60,13 @@ struct DropDownWidget {
         return items[selectedItem].value;
     }
     
+    std::string getSelectedDisplayName() const {
+        if(selectedItem == -1)
+            return "";
+        
+        return items[selectedItem].displayName;
+    }
+    
     bool valueChanged() {
         bool changed = selectedItem != lastSelectedItem;
         lastSelectedItem = selectedItem;

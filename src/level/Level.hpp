@@ -122,6 +122,7 @@ namespace Level {
         
         Polygon3D getGeometry() const;
         SegmentFace& operator=(const SegmentFace& face);
+        Segment& extrude(float dist);
         
     private:
         Segment& seg;
@@ -133,7 +134,7 @@ namespace Level {
         Segment(const Segment& seg) = default;
         Segment(Level& level_, LevelPrism& geometry_, int id_) : level(level_), geometry(geometry_), id(id_), deleted(false) {
             for(int i = 0; i < geometry_.totalFaces(); ++i)
-                faces.push_back(SegmentFace(*this, i));
+                faces.push_back(new SegmentFace(*this, i));
         }
         
         Prism3D getGeometry() const {
@@ -162,9 +163,13 @@ namespace Level {
         
         Segment& operator=(const Segment& seg);
         
+        SegmentFace& getFace(int faceId) {
+            return *faces[faceId];
+        }
+        
     private:
         Level& level;
-        std::vector<SegmentFace> faces;
+        std::vector<SegmentFace*> faces;
         LevelPrism geometry;
         int id;
         bool deleted;

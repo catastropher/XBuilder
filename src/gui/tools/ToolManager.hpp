@@ -39,7 +39,6 @@ struct ToolManager {
         }
         
         if(selectedToolGroup) {
-            ImGui::Separator();
             selectedToolGroup->renderToolDropDown();
             selectedToolGroup->renderToolWindow();
         }
