@@ -17,3 +17,5 @@
 
 #include "FaceTool.hpp"
 #include "ExtrudeFaceTool.hpp"
+#include "ScaleFaceTool.hpp"
+

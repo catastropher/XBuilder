@@ -60,6 +60,10 @@ public:
     bool requiresSelectedFace() const {
         return requireSelectedFace;
     }
+    
+    void deselectFace() {
+        selectedFace.face = nullptr;
+    }
 
 protected:
     Raytracer::FaceIntersection selectedFace;

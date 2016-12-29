@@ -54,7 +54,7 @@ struct Polygon3D {
         translate(calculatePlane().normal * dist);
     }
     
-    Vec3 center() const {
+    Vec3 calculateCenter() const {
         Vec3 center(0, 0, 0);
         
         for(int i = 0; i < totalVertices(); ++i)
@@ -64,5 +64,13 @@ struct Polygon3D {
     }
     
     bool rayIntersectsPolygon(Ray& ray, PlaneIntersection& result);
+    
+    void scaleRelativeToCenter(float scale) {
+        Vec3 center = calculateCenter();
+        
+        for(int i = 0; i < totalVertices(); ++i) {
+            vertices[i] = (vertices[i] - center) * scale + center;
+        }
+    }
 };
 

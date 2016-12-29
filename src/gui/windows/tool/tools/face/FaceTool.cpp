@@ -19,6 +19,8 @@
 void FaceToolGroup::setSelectedTool(std::string name) {
     if(name == "extrude")
         selectedTool = new ExtrudeFaceTool(context);
+    else if(name == "scale")
+        selectedTool = new ScaleFaceTool(context);
     else
         selectedTool = nullptr;
 }

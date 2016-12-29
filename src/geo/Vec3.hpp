@@ -19,6 +19,7 @@
 #include <cmath>
 #include <algorithm>
 #include <X3D/X3D.h>
+#include <tuple>
 
 struct Vec3 {
     float x, y, z;
@@ -101,6 +102,10 @@ struct Vec3 {
     
     X3D_Vex3D toX3DVex3D() const {
         return x3d_vex3d_make(x, y, z);
+    }
+    
+    std::tuple<float, float, float> toTuple() const {
+        return std::make_tuple(x, y, z);
     }
 };
 

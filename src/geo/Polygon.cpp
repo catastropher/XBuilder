@@ -20,7 +20,7 @@
 bool Polygon3D::rayIntersectsPolygon(Ray& ray, PlaneIntersection& result) {
     Plane plane = calculatePlane();
     
-    if(!plane.rayIntersectsPolygon(ray, result))
+    if(!plane.rayIntersectsPlane(ray, result))
         return false;
     
     return Frustum::constructFromPointAndPolygon(ray.v[0], *this).pointIsInsideOf(result.intersection);

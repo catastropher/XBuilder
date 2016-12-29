@@ -30,17 +30,7 @@ struct Vertex {
     Vertex(Vec3 v_) : v(v_) { }
     
     bool operator<(const Vertex& vertex) const {
-        float a[3] = { v.x, v.y, v.z };
-        float b[3] = { vertex.v.x, vertex.v.y, vertex.v.z };
-        
-        for(int i = 0; i < 3; ++i) {
-            if(a[i] < b[i])
-                return true;
-            else if(a[i] > b[i])
-                return false;
-        }
-        
-        return false;
+        return v.toTuple() < vertex.v.toTuple();
     }
 };
 
@@ -119,6 +109,8 @@ public:
     Polygon3D getGeometry() const;
     LevelSegmentFace& operator=(const LevelSegmentFace& face);
     Segment& extrude(float dist);
+    Segment& extrude(Prism3D& newGeometry);
+    
     
     Segment& getSeg() const {
         return seg;

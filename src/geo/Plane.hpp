@@ -50,7 +50,7 @@ struct Plane {
     
     Plane() { }
     
-    bool rayIntersectsPolygon(const Ray& ray, PlaneIntersection& result) const {
+    bool rayIntersectsPlane(const Ray& ray, PlaneIntersection& result, bool allowNegativeT = false) const {
         float den = ray.dir.dot(normal);
         
         if(den == 0)
@@ -58,7 +58,7 @@ struct Plane {
         
         result.t = -(ray.v[0].dot(normal) + d) / den;
         
-        if(result.t < 0)
+        if(result.t < 0 && !allowNegativeT)
             return false;
         
         result.intersection = ray.v[0] + ray.dir * result.t;

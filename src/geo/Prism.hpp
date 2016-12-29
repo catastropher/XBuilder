@@ -70,6 +70,10 @@ struct Prism3D {
         return vertices[vertexId];
     }
     
+    void setVertex(int vertexId, Vec3 v) {
+        vertices[vertexId] = v;
+    }
+    
     void toX3DPrism3D(X3D_Prism3D* dest) {
         dest->base_v = baseVertices();
         

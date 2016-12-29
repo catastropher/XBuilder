@@ -40,6 +40,10 @@ Segment& LevelSegmentFace::extrude(float dist) {
     Prism3D geo = seg.getGeometry();
     Prism3D newSegGeometry = geo.createPrism3DFromExtrudedFace(geo, id, dist);
     
-    return seg.getLevel().addSegment(newSegGeometry);
+    return extrude(newSegGeometry);
+}
+
+Segment& LevelSegmentFace::extrude(Prism3D& newGeometry) {
+    return seg.getLevel().addSegment(newGeometry);
 }
 
