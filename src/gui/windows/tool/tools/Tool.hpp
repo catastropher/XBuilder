@@ -23,18 +23,35 @@
 #include "imgui/imgui.h"
 #include "gui/widgets.hpp"
 #include "gui/MouseState.hpp"
-
 #include "gui/windows/Window.hpp"
+
+#include "geo/Distance.hpp"
+
+struct ToolContextColorPalette {
+    X3D_ColorIndex geometryPreviewColor;
+    X3D_ColorIndex primarySelectColor;
+    
+    ToolContextColorPalette() {
+        geometryPreviewColor = getColorIndex(64, 64, 64);
+        primarySelectColor = getColorIndex(0, 0, 255);
+    }
+    
+private:
+    X3D_ColorIndex getColorIndex(unsigned char r, unsigned g, unsigned char b) {
+        return x3d_color_to_colorindex(x3d_rgb_to_color(r, g, b));
+    }
+};
 
 struct ToolContext {
     Level& level;
+    ToolContextColorPalette colorPalette;
+    Distance::Unit defaultDistanceUnit;
     
-    ToolContext(WindowContext& context) : level(context.level) { }
+    ToolContext(WindowContext& context) : level(context.level), defaultDistanceUnit(Distance::Unit::FEET) { }
 };
 
-struct Tool {
-    ToolContext& context;
-    
+class Tool {
+public:
     Tool(ToolContext& context_) : context(context_) { }
     
     virtual void viewWindowHandleMouse(MouseState& state) { }
@@ -42,15 +59,15 @@ struct Tool {
     virtual void renderToolWindow() { }
     
     virtual ~Tool() { }
+    
+protected:
+    ToolContext& context;
 };
 
 
 
-struct ToolGroup {
-    DropDownWidget toolDropDown;
-    Tool* selectedTool;
-    ToolContext& context;
-    
+class ToolGroup {
+public:
     ToolGroup(ToolContext& context_) : toolDropDown("Tool"), selectedTool(nullptr), context(context_) { }
     
     void renderToolDropDown() {
@@ -65,8 +82,6 @@ struct ToolGroup {
             selectedTool->viewWindowHandleMouse(state);
     }
     
-    virtual void setSelectedTool(std::string name) = 0;
-    
     virtual void viewWindowHandleKeys() { }
     
     virtual void renderToolWindow() {
@@ -78,6 +93,13 @@ struct ToolGroup {
         if(selectedTool)
             delete selectedTool;
     }
+    
+protected:
+    virtual void setSelectedTool(std::string name) = 0;
+    
+    DropDownWidget toolDropDown;
+    Tool* selectedTool;
+    ToolContext& context;
 };
 
 

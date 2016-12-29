@@ -22,7 +22,7 @@ struct ToolManager {
     DropDownWidget toolGroupDropdown;
     ToolContext context;
     
-    ToolManager(WindowContext windowContext) : selectedToolGroup(nullptr), toolGroupDropdown("Tool Group"), context(windowContext) {
+    ToolManager(WindowContext& windowContext) : selectedToolGroup(nullptr), toolGroupDropdown("Tool Group"), context(windowContext) {
         toolGroupDropdown.addItem("face", "Face");
         toolGroupDropdown.addItem("segment", "Segment");
         toolGroupDropdown.addItem("edge", "Edge");

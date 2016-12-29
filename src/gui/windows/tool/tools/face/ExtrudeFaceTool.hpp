@@ -18,28 +18,40 @@
 #include "imgui/imgui.h"
 #include "FaceTool.hpp"
 
-struct ExtrudeFaceTool : FaceTool {
-    FloatSliderInputWidget extrudeDistanceWidget;
-    
-    ExtrudeFaceTool(ToolContext& context_) : FaceTool(context_), extrudeDistanceWidget("Extrude Distance", 100, 1, 3000) { }
+class ExtrudeFaceTool : public FaceTool {
+public:
+    ExtrudeFaceTool(ToolContext& context_) : FaceTool(context_),
+        extrudeDistanceWidget("Extrude Distance", Distance(10, Distance::FEET).toUnit(
+            context_.defaultDistanceUnit),
+            Distance(.25, Distance::FEET), 
+            Distance(100, Distance::FEET)) { }
     
     void renderToolWindow() {
         extrudeDistanceWidget.render();
         
-        float extrudeDist = extrudeDistanceWidget.getValue();
+        float extrudeDist = getExtrudeDistance();
         
         if(ImGui::Button("Extrude!")) {
             selectedFace.face->extrude(extrudeDist);
         }
         
-        if(extrudeDist > 0) {
-            X3D_ColorIndex gray = x3d_color_to_colorindex(x3d_rgb_to_color(64, 64, 64));
-            Prism3D geo = selectedFace.face->getSeg().getGeometry();
-            Prism3D newSegGeometry = geo.createPrism3DFromExtrudedFace(geo, selectedFace.face->getId(), extrudeDist);
-            ViewRenderer::renderPrism3D(newSegGeometry, gray);
-        }
+        if(extrudeDist > 0)
+            showGeometryPreview();
         
         renderSelectedFace();
     }
+    
+private:
+    void showGeometryPreview() const {
+        Prism3D geo = selectedFace.face->getSeg().getGeometry();
+        Prism3D newSegGeometry = geo.createPrism3DFromExtrudedFace(geo, selectedFace.face->getId(), getExtrudeDistance());
+        ViewRenderer::renderPrism3D(newSegGeometry, context.colorPalette.geometryPreviewColor);
+    }
+    
+    float getExtrudeDistance() const {
+        return extrudeDistanceWidget.getDistance().toUnit(Distance::X3D_UNITS).dist;
+    }
+    
+    DistanceSliderInputWidget extrudeDistanceWidget;
 };
 

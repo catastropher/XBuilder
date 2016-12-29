@@ -25,10 +25,8 @@
 #include "level/Raytracer.hpp"
 #include "gui/ViewRenderer.hpp"
 
-struct FaceTool : Tool {
-    Raytracer::FaceIntersection selectedFace;
-    bool requireSelectedFace;
-    
+class FaceTool : public Tool {
+public:
     FaceTool(ToolContext& context_, bool requireSelectedFace_ = true) : Tool(context_), requireSelectedFace(requireSelectedFace_) { }
     
     virtual void updateSelectedFace() { }
@@ -50,11 +48,22 @@ struct FaceTool : Tool {
     
     void renderSelectedFace() {
         if(faceIsSelected()) {
-            X3D_ColorIndex blue = x3d_color_to_colorindex(x3d_rgb_to_color(0, 0, 255));
             Polygon3D face = selectedFace.face->getGeometry();
-            ViewRenderer::renderPolygon(face, blue);
+            ViewRenderer::renderPolygon(face, context.colorPalette.primarySelectColor);
         }
     }
+    
+    Raytracer::FaceIntersection getSelectedFace() const {
+        return selectedFace;
+    }
+    
+    bool requiresSelectedFace() const {
+        return requireSelectedFace;
+    }
+
+protected:
+    Raytracer::FaceIntersection selectedFace;
+    bool requireSelectedFace;
 };
 
 struct FaceToolGroup : ToolGroup {
@@ -76,7 +85,7 @@ struct FaceToolGroup : ToolGroup {
         ImGui::Separator();
         
         if(FaceTool* tool = dynamic_cast<FaceTool*>(selectedTool)) {
-            if(tool->requireSelectedFace && !tool->faceIsSelected()) {
+            if(tool->requiresSelectedFace() && !tool->faceIsSelected()) {
                 ImGui::Text("Please select a face :(");
                 return;
             }

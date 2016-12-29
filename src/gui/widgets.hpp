@@ -17,8 +17,10 @@
 
 #include <vector>
 #include <string>
+#include <X3D/X3D.h>
 
 #include "imgui/imgui.h"
+#include "geo/Distance.hpp"
 
 struct DropDownItem {
     std::string value;
@@ -78,8 +80,8 @@ struct DropDownWidget {
 
 class FloatSliderInputWidget {
 public:
-    FloatSliderInputWidget(std::string label_, float initialValue, float minValue_, float maxValue_)
-        : label(label_), value(initialValue), minValue(minValue_), maxValue(maxValue_), selectedInputType(0) { }
+    FloatSliderInputWidget(std::string label_, float defaultValue, float minValue_, float maxValue_)
+        : label(label_), value(defaultValue), minValue(minValue_), maxValue(maxValue_), selectedInputType(0) { }
     
     void render() {
         ImGui::RadioButton("Slider", &selectedInputType, 0);
@@ -92,8 +94,20 @@ public:
             ImGui::InputFloat(label.c_str(), &value);
     }
     
-    float getValue() {
+    float getValue() const {
         return value;
+    }
+    
+protected:
+    FloatSliderInputWidget(std::string label_) : label(label_), selectedInputType(0) { }
+    
+    void setRange(float minValue_, float maxValue_) {
+        minValue = minValue_;
+        maxValue = maxValue_;
+    }
+    
+    void setValue(float val) {
+        value = val;
     }
     
 private:
@@ -102,5 +116,50 @@ private:
     float minValue;
     float maxValue;
     int selectedInputType;
+};
+
+class DistanceSliderInputWidget : private FloatSliderInputWidget {
+public:
+    DistanceSliderInputWidget(std::string label_, Distance defaultValue, Distance minDistValue_, Distance maxDistValue_) :
+        FloatSliderInputWidget(label_),
+        minDistValue(minDistValue_.toUnit(defaultValue.unit)),
+        maxDistValue(maxDistValue_.toUnit(defaultValue.unit)),
+        currentUnit(defaultValue.unit),
+        previousUnit(defaultValue.unit) {
+            setValue(defaultValue.dist);
+            updateUnit();
+        }
+        
+    void render() {
+        ImGui::RadioButton("ft", (int *)&currentUnit, Distance::Unit::FEET);
+        ImGui::SameLine();
+        ImGui::RadioButton("m", (int *)&currentUnit, Distance::Unit::METERS);
+        ImGui::SameLine();
+        ImGui::RadioButton("X3D units", (int *)&currentUnit, Distance::Unit::X3D_UNITS);
+        
+        updateUnit();
+        
+        FloatSliderInputWidget::render();
+    }
+    
+    Distance getDistance() const {
+        return Distance(getValue(), currentUnit);
+    }
+    
+private:
+    void updateUnit() {
+        setRange(
+            minDistValue.toUnit(currentUnit).dist,
+            maxDistValue.toUnit(currentUnit).dist
+        );
+        
+        setValue(Distance(getValue(), previousUnit).toUnit(currentUnit).dist);
+        previousUnit = currentUnit;
+    }
+    
+    Distance minDistValue;
+    Distance maxDistValue;
+    Distance::Unit currentUnit;
+    Distance::Unit previousUnit;
 };
 
