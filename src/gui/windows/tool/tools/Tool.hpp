@@ -27,7 +27,7 @@
 #include "gui/windows/Window.hpp"
 
 struct ToolContext {
-    Level::Level& level;
+    Level& level;
     
     ToolContext(WindowContext& context) : level(context.level) { }
 };

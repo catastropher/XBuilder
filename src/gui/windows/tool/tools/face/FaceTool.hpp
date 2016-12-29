@@ -25,7 +25,7 @@
 #include "level/Raytracer.hpp"
 
 struct FaceTool : Tool {
-    Level::Raytracer::FaceIntersection selectedFace;
+    Raytracer::FaceIntersection selectedFace;
     bool requireSelectedFace;
     
     FaceTool(ToolContext& context_, bool requireSelectedFace_ = true) : Tool(context_), requireSelectedFace(requireSelectedFace_) { }
@@ -36,7 +36,7 @@ struct FaceTool : Tool {
         X3D_CameraObject* viewCamera = x3d_playermanager_get()->player[0].cam;
         
         if(state.leftPressed) {
-            Level::Raytracer raytracer(context.level, viewCamera, state.pos);
+            Raytracer raytracer(context.level, viewCamera, state.pos);
             
             if(raytracer.findClosestIntersectedFace(selectedFace))
                 updateSelectedFace();

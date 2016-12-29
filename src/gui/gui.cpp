@@ -33,7 +33,7 @@ using namespace std;
 
 extern "C" void test_render_callback(X3D_CameraObject* cam);
 
-extern Level::Level globalLevel;
+extern Level globalLevel;
 
 ToolManager* globalToolManager;
 

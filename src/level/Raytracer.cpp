@@ -17,35 +17,30 @@
 
 #include "Raytracer.hpp"
 
-namespace Level {
-
-    bool Raytracer::findClosestIntersectedFace(Raytracer::FaceIntersection& result) {
-        FaceIntersection closestIntersection;
-        
-        for(Level::SegmentIterator seg = level.segmentBegin(); seg != level.segmentEnd(); ++seg)
-            closestIntersection = std::min(closestIntersection, findClosestIntersectionForSegment(*seg));
-        
-        result = closestIntersection;
-        
-        return result.seg != nullptr;
-    }
+bool Raytracer::findClosestIntersectedFace(Raytracer::FaceIntersection& result) {
+    FaceIntersection closestIntersection;
     
-    Raytracer::FaceIntersection Raytracer::findClosestIntersectionForSegment(Segment& seg) {
-        FaceIntersection closestIntersection;
-        Prism3D geometry = seg.getGeometry();
-        
-        for(int i = 0; i < geometry.totalFaces(); ++i) {
-            Polygon3D face = geometry.getFace(i);
-            PlaneIntersection planeIntersection;
-            
-            if(face.rayIntersectsPolygon(ray, planeIntersection))
-                closestIntersection = std::min(closestIntersection, FaceIntersection(planeIntersection, &seg, i));
-        }
-        
-        return closestIntersection;
-    }
+    for(Level::SegmentIterator seg = level.segmentBegin(); seg != level.segmentEnd(); ++seg)
+        closestIntersection = std::min(closestIntersection, findClosestIntersectionForSegment(*seg));
+    
+    result = closestIntersection;
+    
+    return result.seg != nullptr;
 }
 
-
-
-
+Raytracer::FaceIntersection Raytracer::findClosestIntersectionForSegment(Segment& seg) {
+    FaceIntersection closestIntersection;
+    Prism3D geometry = seg.getGeometry();
+    
+    for(int i = 0; i < geometry.totalFaces(); ++i) {
+        Polygon3D face = geometry.getFace(i);
+        PlaneIntersection planeIntersection;
+        
+        if(face.rayIntersectsPolygon(ray, planeIntersection))
+            closestIntersection = std::min(closestIntersection, FaceIntersection(planeIntersection, &seg, i));
+    }
+    
+    return closestIntersection;
+}
+    
+    

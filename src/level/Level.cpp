@@ -15,41 +15,38 @@
 
 #include "Level.hpp"
 
-namespace Level {
-    Polygon3D SegmentFace::getGeometry() const {
-        return seg.getGeometry().getFace(id);
-    }
+Polygon3D LevelSegmentFace::getGeometry() const {
+    return seg.getGeometry().getFace(id);
+}
 
-    Segment& Segment::operator=(const Segment& seg) {
-        level = seg.level;
-        faces = seg.faces;
-        geometry = seg.geometry;
-        id = seg.id;
-        deleted = seg.deleted;
-        
-        return *this;
-    }
+Segment& Segment::operator=(const Segment& seg) {
+    level = seg.level;
+    faces = seg.faces;
+    geometry = seg.geometry;
+    id = seg.id;
+    deleted = seg.deleted;
     
-    SegmentFace& SegmentFace::operator=(const SegmentFace& face) {
-        seg = face.seg;
-        id = face.id;
-        
-        return *this;
-    }
-    
-    Segment& SegmentFace::extrude(float dist) {
-        Polygon3D newBaseA = getGeometry();
-        newBaseA.reverse();
-        
-        Prism3D newGeometry(newBaseA.totalVertices());
-        newGeometry.setFace(Prism3D::BASE_A, newBaseA);
-        
-        Polygon3D newBaseB = getGeometry();
-        newBaseB.translateAlongNormal(-dist);
-        newGeometry.setFace(Prism3D::BASE_B, newBaseB);
-        
-        return seg.getLevel().addSegment(newGeometry);
-    }
+    return *this;
+}
 
+LevelSegmentFace& LevelSegmentFace::operator=(const LevelSegmentFace& face) {
+    seg = face.seg;
+    id = face.id;
+    
+    return *this;
+}
+
+Segment& LevelSegmentFace::extrude(float dist) {
+    Polygon3D newBaseA = getGeometry();
+    newBaseA.reverse();
+    
+    Prism3D newGeometry(newBaseA.totalVertices());
+    newGeometry.setFace(Prism3D::BASE_A, newBaseA);
+    
+    Polygon3D newBaseB = getGeometry();
+    newBaseB.translateAlongNormal(-dist);
+    newGeometry.setFace(Prism3D::BASE_B, newBaseB);
+    
+    return seg.getLevel().addSegment(newGeometry);
 }
 

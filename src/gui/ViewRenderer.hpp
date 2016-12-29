@@ -16,24 +16,9 @@
 #pragma once
 
 #include "level/Level.hpp"
-#include "windows/windows.hpp"
 
-struct GuiManager {
+class ViewRenderer {
 public:
-    GuiManager(Level& level_) : context(level_), toolWindow(context), viewWindow(context) { }
-    
-    void render() {
-        viewWindow.render();
-        
-        MouseState mouseState = viewWindow.getMouseStateRelativeToWindow();
-        
-        toolWindow.handleMouse(mouseState);
-        toolWindow.render();
-    }
-    
-private:
-    WindowContext context;
-    ToolWindow toolWindow;
-    ViewWindow viewWindow;
+    static void renderAllSegmentsInLevel(Level::Level& level);
 };
 

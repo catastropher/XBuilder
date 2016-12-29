@@ -16,12 +16,12 @@
 #pragma once
 
 #include "gui/MouseState.hpp"
-#include <level/Level.hpp>
+#include "level/Level.hpp"
 
 struct WindowContext {
-    Level::Level& level;
+    Level& level;
     
-    WindowContext(Level::Level& level_) : level(level_) { }
+    WindowContext(Level& level_) : level(level_) { }
 };
 
 class Window {

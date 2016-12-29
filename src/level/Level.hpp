@@ -22,248 +22,244 @@
 #include "geo/geo.hpp"
 #include "texture.hpp"
 
-namespace Level {
+class Level;
+    
+struct Vertex {
+    Vec3 v;
+    
+    Vertex(Vec3 v_) : v(v_) { }
+    
+    bool operator<(const Vertex& vertex) const {
+        float a[3] = { v.x, v.y, v.z };
+        float b[3] = { vertex.v.x, vertex.v.y, vertex.v.z };
+        
+        for(int i = 0; i < 3; ++i) {
+            if(a[i] < b[i])
+                return true;
+            else if(a[i] > b[i])
+                return false;
+        }
+        
+        return false;
+    }
+};
 
-    class Level;
-    struct SegmentEditor;
-    struct FaceEditor;
-        
-    struct Vertex {
-        Vec3 v;
-        
-        Vertex(Vec3 v_) : v(v_) { }
-        
-        bool operator<(const Vertex& vertex) const {
-            float a[3] = { v.x, v.y, v.z };
-            float b[3] = { vertex.v.x, vertex.v.y, vertex.v.z };
-            
-            for(int i = 0; i < 3; ++i) {
-                if(a[i] < b[i])
-                    return true;
-                else if(a[i] > b[i])
-                    return false;
-            }
-            
-            return false;
-        }
-    };
+struct LevelPrism {
+public:
+    LevelPrism(std::vector<Vertex*> vertices_) : vertices(vertices_) { }
     
-    struct LevelPrism {
-    public:
-        LevelPrism(std::vector<Vertex*> vertices_) : vertices(vertices_) { }
-        
-        int baseVertices() const {
-            return vertices.size() / 2;
-        }
-        
-        int totalFaces() const {
-            return baseVertices() + 2;
-        }
-        
-        Prism3D getGeometry() const {
-            std::vector<Vec3> v;
+    int baseVertices() const {
+        return vertices.size() / 2;
+    }
+    
+    int totalFaces() const {
+        return baseVertices() + 2;
+    }
+    
+    Prism3D getGeometry() const {
+        std::vector<Vec3> v;
 
-            for(int i = 0; i < (int)vertices.size(); ++i)
-                v.push_back(vertices[i]->v);
-            
-            return Prism3D(v);
-        }
+        for(int i = 0; i < (int)vertices.size(); ++i)
+            v.push_back(vertices[i]->v);
         
-        void updateGeometry(Prism3D& updatedGeometry) {
-            for(int i = 0; i < (int)vertices.size(); ++i)
-                vertices[i]->v = updatedGeometry.getVertex(i);
-        }
-        
-    private:
-        std::vector<Vertex*> vertices;
-    };
+        return Prism3D(v);
+    }
     
-    class VertexManager {
-    public:
-        Vertex* addVertex(Vec3 v) {
-            Vertex vertex(v);
-            
-            if(vertices.count(vertex) != 0)
-                return vertices[vertex];
-            
-            Vertex* newVertex = new Vertex(v);
-            vertices[vertex] = newVertex;
-            
-            return newVertex;
-        }
-        
-        LevelPrism addLevelPrism(Prism3D& geometry) {
-            std::vector<Vertex*> v;
-            
-            for(int i = 0; i < geometry.totalVertices(); ++i)
-                v.push_back(addVertex(geometry.getVertex(i)));
-            
-            return LevelPrism(v);
-        }
-        
-        ~VertexManager() {
-            for(auto v : vertices) {
-                delete v.second;
-            }
-            
-            vertices.clear();
-        }
-        
-    private:
-        std::map<Vertex, Vertex*> vertices;
-    };
+    void updateGeometry(Prism3D& updatedGeometry) {
+        for(int i = 0; i < (int)vertices.size(); ++i)
+            vertices[i]->v = updatedGeometry.getVertex(i);
+    }
+    
+private:
+    std::vector<Vertex*> vertices;
+};
 
-    struct Segment;
-    struct Level;
-    
-    class SegmentFace {
-    public:
-        SegmentFace(Segment& seg_, int id_) : seg(seg_), id(id_) { }
+class VertexManager {
+public:
+    Vertex* addVertex(Vec3 v) {
+        Vertex vertex(v);
         
-        Polygon3D getGeometry() const;
-        SegmentFace& operator=(const SegmentFace& face);
-        Segment& extrude(float dist);
+        if(vertices.count(vertex) != 0)
+            return vertices[vertex];
+        
+        Vertex* newVertex = new Vertex(v);
+        vertices[vertex] = newVertex;
+        
+        return newVertex;
+    }
+    
+    LevelPrism addLevelPrism(Prism3D& geometry) {
+        std::vector<Vertex*> v;
+        
+        for(int i = 0; i < geometry.totalVertices(); ++i)
+            v.push_back(addVertex(geometry.getVertex(i)));
+        
+        return LevelPrism(v);
+    }
+    
+    ~VertexManager() {
+        for(auto v : vertices) {
+            delete v.second;
+        }
+        
+        vertices.clear();
+    }
+    
+private:
+    std::map<Vertex, Vertex*> vertices;
+};
+
+struct Segment;
+struct Level;
+
+class LevelSegmentFace {
+public:
+    LevelSegmentFace(Segment& seg_, int id_) : seg(seg_), id(id_) { }
+    
+    Polygon3D getGeometry() const;
+    LevelSegmentFace& operator=(const LevelSegmentFace& face);
+    Segment& extrude(float dist);
+    
+private:
+    Segment& seg;
+    int id;
+};
+
+class Segment {
+public:
+    Segment(const Segment& seg) = default;
+    Segment(Level& level_, LevelPrism& geometry_, int id_) : level(level_), geometry(geometry_), id(id_), deleted(false) {
+        for(int i = 0; i < geometry_.totalFaces(); ++i)
+            faces.push_back(new LevelSegmentFace(*this, i));
+    }
+    
+    Prism3D getGeometry() const {
+        return geometry.getGeometry();
+    }
+    
+    void updateGeometry(Prism3D& updatedGeometry) {
+        geometry.updateGeometry(updatedGeometry);
+    }
+    
+    bool isDeleted() const {
+        return deleted;
+    }
+    
+    void deleteSelf() {
+        deleted = true;
+    }
+    
+    void undeleteSelf() {
+        deleted = false;
+    }
+    
+    Level& getLevel() const {
+        return level;
+    }
+    
+    Segment& operator=(const Segment& seg);
+    
+    LevelSegmentFace& getFace(int faceId) {
+        return *faces[faceId];
+    }
+    
+    ~Segment() {
+        for(int i = 0; i < (int)geometry.totalFaces(); ++i)
+            delete faces[i];
+    }
+    
+private:
+    Level& level;
+    std::vector<LevelSegmentFace*> faces;
+    LevelPrism geometry;
+    int id;
+    bool deleted;
+};
+
+class Level {
+public:
+    class SegmentIterator {
+    public:
+        SegmentIterator(Segment** seg_, Segment** end_) : seg(seg_), end(end_)  {
+            if(shouldSkipDeletedSegment(seg))
+                *this = next();
+        }
+        
+        SegmentIterator next() const {
+            Segment** s = seg + 1;
+            
+            while(shouldSkipDeletedSegment(s))
+                ++s;
+            
+            return SegmentIterator(s, end);
+        }
+        
+        SegmentIterator& operator=(const SegmentIterator& segIterator) {
+            seg = segIterator.seg;
+            end = segIterator.end;
+            return *this;
+        }
+        
+        bool operator==(const SegmentIterator& segIterator) const {
+            return seg == segIterator.seg;
+        }
+        
+        bool operator!=(const SegmentIterator& segIterator) const {
+            return !(*this == segIterator);
+        }
+        
+        SegmentIterator& operator++() {
+            *this = this->next();
+            return *this;
+        }
+        
+        Segment& operator*() const {
+            return **seg;
+        }
+        
+        Segment* operator->() const {
+            return *seg;
+        }
         
     private:
-        Segment& seg;
-        int id;
+        bool shouldSkipDeletedSegment(Segment** s) const {
+            return s < end && (*s)->isDeleted();
+        }
+        
+        Segment** seg;
+        Segment** end;
     };
     
-    class Segment {
-    public:
-        Segment(const Segment& seg) = default;
-        Segment(Level& level_, LevelPrism& geometry_, int id_) : level(level_), geometry(geometry_), id(id_), deleted(false) {
-            for(int i = 0; i < geometry_.totalFaces(); ++i)
-                faces.push_back(new SegmentFace(*this, i));
-        }
-        
-        Prism3D getGeometry() const {
-            return geometry.getGeometry();
-        }
-        
-        void updateGeometry(Prism3D& updatedGeometry) {
-            geometry.updateGeometry(updatedGeometry);
-        }
-        
-        bool isDeleted() const {
-            return deleted;
-        }
-        
-        void deleteSelf() {
-            deleted = true;
-        }
-        
-        void undeleteSelf() {
-            deleted = false;
-        }
-        
-        Level& getLevel() const {
-            return level;
-        }
-        
-        Segment& operator=(const Segment& seg);
-        
-        SegmentFace& getFace(int faceId) {
-            return *faces[faceId];
-        }
-        
-        ~Segment() {
-            for(int i = 0; i < (int)geometry.totalFaces(); ++i)
-                delete faces[i];
-        }
-        
-    private:
-        Level& level;
-        std::vector<SegmentFace*> faces;
-        LevelPrism geometry;
-        int id;
-        bool deleted;
-    };
+    SegmentIterator segmentBegin() {
+        return SegmentIterator(&segments[0], &segments[segments.size()]);
+    }
     
-    class Level {
-    public:
-        class SegmentIterator {
-        public:
-            SegmentIterator(Segment** seg_, Segment** end_) : seg(seg_), end(end_)  {
-                if(shouldSkipDeletedSegment(seg))
-                    *this = next();
-            }
-            
-            SegmentIterator next() const {
-                Segment** s = seg + 1;
-                
-                while(shouldSkipDeletedSegment(s))
-                    ++s;
-                
-                return SegmentIterator(s, end);
-            }
-            
-            SegmentIterator& operator=(const SegmentIterator& segIterator) {
-                seg = segIterator.seg;
-                end = segIterator.end;
-                return *this;
-            }
-            
-            bool operator==(const SegmentIterator& segIterator) const {
-                return seg == segIterator.seg;
-            }
-            
-            bool operator!=(const SegmentIterator& segIterator) const {
-                return !(*this == segIterator);
-            }
-            
-            SegmentIterator& operator++() {
-                *this = this->next();
-                return *this;
-            }
-            
-            Segment& operator*() const {
-                return **seg;
-            }
-            
-            Segment* operator->() const {
-                return *seg;
-            }
-            
-        private:
-            bool shouldSkipDeletedSegment(Segment** s) const {
-                return s < end && (*s)->isDeleted();
-            }
-            
-            Segment** seg;
-            Segment** end;
-        };
+    SegmentIterator segmentEnd() {
+        return SegmentIterator(&segments[segments.size()], &segments[segments.size()]);
+    }
+    
+    
+    Segment& addSegment(Prism3D& geometry) {
+        LevelPrism prism = vertexManager.addLevelPrism(geometry);
         
-        SegmentIterator segmentBegin() {
-            return SegmentIterator(&segments[0], &segments[segments.size()]);
-        }
+        Segment* newSegment = new Segment(*this, prism, segments.size());
+        segments.push_back(newSegment);
         
-        SegmentIterator segmentEnd() {
-            return SegmentIterator(&segments[segments.size()], &segments[segments.size()]);
-        }
-        
-        
-        Segment& addSegment(Prism3D& geometry) {
-            LevelPrism prism = vertexManager.addLevelPrism(geometry);
-            
-            Segment* newSegment = new Segment(*this, prism, segments.size());
-            segments.push_back(newSegment);
-            
-            return *newSegment;
-        }
-        
-        Segment& getSegment(int id) const {
-            return *segments[id];
-        }
-        
-        ~Level() {
-            for(int i = 0; i < (int)segments.size(); ++i)
-                delete segments[i];
-        }
-        
-    private:
-        VertexManager vertexManager;
-        std::vector<Segment*> segments;
-    };
-}
+        return *newSegment;
+    }
+    
+    Segment& getSegment(int id) const {
+        return *segments[id];
+    }
+    
+    ~Level() {
+        for(int i = 0; i < (int)segments.size(); ++i)
+            delete segments[i];
+    }
+    
+private:
+    VertexManager vertexManager;
+    std::vector<Segment*> segments;
+};
+
 

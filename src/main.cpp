@@ -49,16 +49,16 @@ void xbuilder_handle_keys(void);
 
 #include "level/Level.hpp"
 
-Level::Level globalLevel;
+Level globalLevel;
 
-void renderAllSegments(Level::Level& level, X3D_CameraObject* cam) {
+void renderAllSegments(Level& level, X3D_CameraObject* cam) {
     X3D_Vex3D v[32];
     X3D_Prism3D prism;
     prism.v = v;
     
     X3D_ColorIndex red = x3d_color_to_colorindex(x3d_rgb_to_color(255, 0, 0));
     
-    for(Level::Level::SegmentIterator seg = level.segmentBegin(); seg != level.segmentEnd(); ++seg) {
+    for(Level::SegmentIterator seg = level.segmentBegin(); seg != level.segmentEnd(); ++seg) {
         seg->getGeometry().toX3DPrism3D(&prism);
     
         x3d_prism3d_render_wireframe(&prism, cam, red);
