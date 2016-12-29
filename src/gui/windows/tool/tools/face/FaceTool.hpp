@@ -23,6 +23,7 @@
 #include "gui/widgets.hpp"
 #include "../Tool.hpp"
 #include "level/Raytracer.hpp"
+#include "gui/ViewRenderer.hpp"
 
 struct FaceTool : Tool {
     Raytracer::FaceIntersection selectedFace;
@@ -45,6 +46,14 @@ struct FaceTool : Tool {
     
     bool faceIsSelected() const {
         return selectedFace.validIntersection();
+    }
+    
+    void renderSelectedFace() {
+        if(faceIsSelected()) {
+            X3D_ColorIndex blue = x3d_color_to_colorindex(x3d_rgb_to_color(0, 0, 255));
+            Polygon3D face = selectedFace.face->getGeometry();
+            ViewRenderer::renderPolygon(face, blue);
+        }
     }
 };
 

@@ -20,6 +20,7 @@
 
 #include "imgui/imgui.h"
 #include "../Window.hpp"
+#include "gui/ViewRenderer.hpp"
 
 #include "texture.hpp"
 
@@ -37,11 +38,18 @@ public:
         renderTextureId = OpenGLTextureManager::addX3DTexture(&tex);
     }
     
-    void render() {
-        X3D_CameraObject* cam = x3d_playermanager_get()->player[0].cam;
-        x3d_read_keys();
+    void beginRender() {
         x3d_screen_clear(0);
-        test_render_callback(cam);
+    }
+    
+    void renderSegmentsInLevel() {
+        X3D_ColorIndex red = x3d_color_to_colorindex(x3d_rgb_to_color(255, 0, 0));
+        ViewRenderer::renderAllSegmentsInLevel(context.level, red);
+    }
+    
+    void renderWindow() {
+        x3d_read_keys();
+        
         x3d_keymanager_get()->key_handler();
         updateRenderOutputTexture();
         

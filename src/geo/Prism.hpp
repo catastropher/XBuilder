@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with XBuilder. If not, see <http://www.gnu.org/licenses/>.
 
+#pragma once
+
 #include <vector>
 
 #include "Vec3.hpp"
@@ -73,6 +75,20 @@ struct Prism3D {
         
         for(int i = 0; i < totalVertices(); ++i)
             dest->v[i] = vertices[i].toX3DVex3D();
+    }
+    
+    Prism3D createPrism3DFromExtrudedFace(Prism3D& prism, int face, float extrudeDist) {
+        Polygon3D newBaseA = getFace(face);
+        newBaseA.reverse();
+        
+        Prism3D newGeometry(newBaseA.totalVertices());
+        newGeometry.setFace(Prism3D::BASE_A, newBaseA);
+        
+        Polygon3D newBaseB = getFace(face);
+        newBaseB.translateAlongNormal(-extrudeDist);
+        newGeometry.setFace(Prism3D::BASE_B, newBaseB);
+        
+        return newGeometry;
     }
     
 private:

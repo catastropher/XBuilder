@@ -27,6 +27,7 @@ struct DropDownItem {
     DropDownItem(std::string value_, std::string displayName_) : value(value_), displayName(displayName_) { }
 };
 
+// TODO: This should be a class
 struct DropDownWidget {
     std::vector<DropDownItem> items;
     int selectedItem;
@@ -74,3 +75,32 @@ struct DropDownWidget {
         return changed;
     }
 };
+
+class FloatSliderInputWidget {
+public:
+    FloatSliderInputWidget(std::string label_, float initialValue, float minValue_, float maxValue_)
+        : label(label_), value(initialValue), minValue(minValue_), maxValue(maxValue_), selectedInputType(0) { }
+    
+    void render() {
+        ImGui::RadioButton("Slider", &selectedInputType, 0);
+        ImGui::SameLine();
+        ImGui::RadioButton("Input", &selectedInputType, 1);
+        
+        if(selectedInputType == 0)
+            ImGui::SliderFloat(label.c_str(), &value, minValue, maxValue);
+        else
+            ImGui::InputFloat(label.c_str(), &value);
+    }
+    
+    float getValue() {
+        return value;
+    }
+    
+private:
+    std::string label;
+    float value;
+    float minValue;
+    float maxValue;
+    int selectedInputType;
+};
+

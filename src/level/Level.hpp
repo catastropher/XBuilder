@@ -120,6 +120,14 @@ public:
     LevelSegmentFace& operator=(const LevelSegmentFace& face);
     Segment& extrude(float dist);
     
+    Segment& getSeg() const {
+        return seg;
+    }
+    
+    int getId() const {
+        return id;
+    }
+    
 private:
     Segment& seg;
     int id;

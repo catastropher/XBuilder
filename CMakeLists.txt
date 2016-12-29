@@ -16,6 +16,9 @@ add_executable(XBuilder
   src/keys.cpp
   src/texture.cpp
   
+  src/gui/gui.cpp
+  src/gui/ViewRenderer.cpp
+  
   src/gui/windows/tool/tools/ToolManager.cpp
   src/gui/windows/tool/tools/face/FaceTool.cpp
   
@@ -25,8 +28,6 @@ add_executable(XBuilder
   src/imgui/imgui_impl_sdl_gl3.cpp
   src/imgui/imgui.cpp
   src/imgui/imgui_draw.cpp
-  
-  src/gui/gui.cpp
 )
 
 find_package(Boost REQUIRED COMPONENTS filesystem)

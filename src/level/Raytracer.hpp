@@ -22,18 +22,17 @@ class Raytracer {
 public:
     struct FaceIntersection {
         PlaneIntersection intersection;
-        Segment* seg;
-        int faceId;
+        LevelSegmentFace* face;
         
-        FaceIntersection() : seg(nullptr) { }
-        FaceIntersection(PlaneIntersection& intersection_, Segment* seg_, int faceId_) : intersection(intersection_), seg(seg_), faceId(faceId_) { }
+        FaceIntersection() : face(nullptr) { }
+        FaceIntersection(PlaneIntersection& intersection_, LevelSegmentFace* face_) : intersection(intersection_), face(face_){ }
         
         bool operator<(const FaceIntersection& inter) const {
             return intersection < inter.intersection;
         }
         
         bool validIntersection() const {
-            return seg != nullptr;
+            return face != nullptr;
         }
     };
     

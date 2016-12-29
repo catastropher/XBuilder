@@ -25,7 +25,7 @@ bool Raytracer::findClosestIntersectedFace(Raytracer::FaceIntersection& result) 
     
     result = closestIntersection;
     
-    return result.seg != nullptr;
+    return result.face != nullptr;
 }
 
 Raytracer::FaceIntersection Raytracer::findClosestIntersectionForSegment(Segment& seg) {
@@ -37,7 +37,7 @@ Raytracer::FaceIntersection Raytracer::findClosestIntersectionForSegment(Segment
         PlaneIntersection planeIntersection;
         
         if(face.rayIntersectsPolygon(ray, planeIntersection))
-            closestIntersection = std::min(closestIntersection, FaceIntersection(planeIntersection, &seg, i));
+            closestIntersection = std::min(closestIntersection, FaceIntersection(planeIntersection, &seg.getFace(i)));
     }
     
     return closestIntersection;

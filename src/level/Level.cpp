@@ -37,16 +37,9 @@ LevelSegmentFace& LevelSegmentFace::operator=(const LevelSegmentFace& face) {
 }
 
 Segment& LevelSegmentFace::extrude(float dist) {
-    Polygon3D newBaseA = getGeometry();
-    newBaseA.reverse();
+    Prism3D geo = seg.getGeometry();
+    Prism3D newSegGeometry = geo.createPrism3DFromExtrudedFace(geo, id, dist);
     
-    Prism3D newGeometry(newBaseA.totalVertices());
-    newGeometry.setFace(Prism3D::BASE_A, newBaseA);
-    
-    Polygon3D newBaseB = getGeometry();
-    newBaseB.translateAlongNormal(-dist);
-    newGeometry.setFace(Prism3D::BASE_B, newBaseB);
-    
-    return seg.getLevel().addSegment(newGeometry);
+    return seg.getLevel().addSegment(newSegGeometry);
 }
 

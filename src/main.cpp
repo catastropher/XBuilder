@@ -51,19 +51,6 @@ void xbuilder_handle_keys(void);
 
 Level globalLevel;
 
-void renderAllSegments(Level& level, X3D_CameraObject* cam) {
-    X3D_Vex3D v[32];
-    X3D_Prism3D prism;
-    prism.v = v;
-    
-    X3D_ColorIndex red = x3d_color_to_colorindex(x3d_rgb_to_color(255, 0, 0));
-    
-    for(Level::SegmentIterator seg = level.segmentBegin(); seg != level.segmentEnd(); ++seg) {
-        seg->getGeometry().toX3DPrism3D(&prism);
-    
-        x3d_prism3d_render_wireframe(&prism, cam, red);
-    }
-}
 
 extern "C" void test_render_callback(X3D_CameraObject* cam) {
     //x3d_render_3d_grid(cam, x3d_vex3d_make(0, creation_plane_y, 0), 100, 20, 20);
@@ -71,7 +58,6 @@ extern "C" void test_render_callback(X3D_CameraObject* cam) {
     
     //render_level(global_level, cam);
     
-    renderAllSegments(globalLevel, cam);
     //globalToolState->renderLevel(cam);
 }
 

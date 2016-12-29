@@ -15,10 +15,22 @@
 
 #pragma once
 
+#include <X3D/X3D.h>
+
 #include "level/Level.hpp"
+#include "geo/Polygon.hpp"
+#include "geo/Prism.hpp"
 
 class ViewRenderer {
 public:
-    static void renderAllSegmentsInLevel(Level::Level& level);
+    static void renderSegment(Segment& seg, X3D_ColorIndex color);
+    static void renderPrism3D(Prism3D& prism, X3D_ColorIndex color);
+    static void renderAllSegmentsInLevel(Level& level, X3D_ColorIndex color);
+    static void renderPolygon(Polygon3D& poly, X3D_ColorIndex color);
+    
+private:
+    static X3D_CameraObject* getCameraObject() {
+        return x3d_playermanager_get()->player[0].cam;
+    }
 };
 

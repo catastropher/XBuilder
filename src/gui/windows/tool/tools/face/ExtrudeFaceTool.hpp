@@ -19,16 +19,27 @@
 #include "FaceTool.hpp"
 
 struct ExtrudeFaceTool : FaceTool {
-    float extrudeAmount;
+    FloatSliderInputWidget extrudeDistanceWidget;
     
-    ExtrudeFaceTool(ToolContext& context_) : FaceTool(context_), extrudeAmount(100) { }
+    ExtrudeFaceTool(ToolContext& context_) : FaceTool(context_), extrudeDistanceWidget("Extrude Distance", 100, 1, 3000) { }
     
     void renderToolWindow() {
-        ImGui::InputFloat("Extrude Amount", &extrudeAmount);
+        extrudeDistanceWidget.render();
+        
+        float extrudeDist = extrudeDistanceWidget.getValue();
         
         if(ImGui::Button("Extrude!")) {
-            selectedFace.seg->getFace(selectedFace.faceId).extrude(extrudeAmount);
+            selectedFace.face->extrude(extrudeDist);
         }
+        
+        if(extrudeDist > 0) {
+            X3D_ColorIndex gray = x3d_color_to_colorindex(x3d_rgb_to_color(64, 64, 64));
+            Prism3D geo = selectedFace.face->getSeg().getGeometry();
+            Prism3D newSegGeometry = geo.createPrism3DFromExtrudedFace(geo, selectedFace.face->getId(), extrudeDist);
+            ViewRenderer::renderPrism3D(newSegGeometry, gray);
+        }
+        
+        renderSelectedFace();
     }
 };
 

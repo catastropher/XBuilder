@@ -23,12 +23,15 @@ public:
     GuiManager(Level& level_) : context(level_), toolWindow(context), viewWindow(context) { }
     
     void render() {
-        viewWindow.render();
+        viewWindow.beginRender();
+        viewWindow.renderSegmentsInLevel();
         
         MouseState mouseState = viewWindow.getMouseStateRelativeToWindow();
         
         toolWindow.handleMouse(mouseState);
         toolWindow.render();
+        
+        viewWindow.renderWindow();
     }
     
 private:
