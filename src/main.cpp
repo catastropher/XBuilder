@@ -77,20 +77,6 @@ int main() {
     //testPack();
     //return 0;
     
-    X3D_Level level;// = builder.buildX3DLevel();
-    x3d_level_init(&level);
-    
-    X3D_Prism3D prism;
-    X3D_Vex3D v[32];
-    prism.v = v;
-    
-    X3D_Vex3D_angle256 angle = { 0, 0, 0 };
-    
-    x3d_prism3d_construct(&prism, 8, 400, 200, angle);
-    Prism3D p = Prism3D(prism);
-    
-    globalLevel.addSegment(p);
-    
     init();
     
     //setup_key_map();
@@ -101,7 +87,6 @@ int main() {
     
     x3d_camera_init();
     X3D_CameraObject* cam = x3d_playermanager_get()->player[0].cam;
-    global_level = &level;
     cam->base.angle = (X3D_Vex3D_angle256) { 0, 0, 0 };
     x3d_mat3x3_construct(&cam->base.mat, &cam->base.angle);
     

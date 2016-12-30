@@ -27,6 +27,7 @@ public:
     static void renderPrism3D(Prism3D& prism, X3D_ColorIndex color);
     static void renderAllSegmentsInLevel(Level& level, X3D_ColorIndex color);
     static void renderPolygon(Polygon3D& poly, X3D_ColorIndex color);
+    static void renderRay(Ray ray, X3D_ColorIndex color);
     
 private:
     static X3D_CameraObject* getCameraObject() {

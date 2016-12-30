@@ -45,6 +45,10 @@ public:
     
 private:
     
+    void renderGeometryPos() const {
+        ImGui::Text("Center x: %f y: %f z: %f", newPrismPosition.x, newPrismPosition.y, newPrismPosition.z);
+    }
+    
     Prism3D getNewGeometry() const {
         Prism3D geo = Prism3D::construct(sidesWidget.getValue(), lengthWidget.getDistanceInUnits(), heightWidget.getDistanceInUnits(), Vec3(), newPrismPosition);
         return geo;
@@ -56,6 +60,7 @@ private:
         
         Prism3D geo = getNewGeometry();
         ViewRenderer::renderPrism3D(geo, context.colorPalette.geometryPreviewColor);
+        renderGeometryPos();
     }
     
     void viewWindowHandleMouse(MouseState& state) {

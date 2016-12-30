@@ -51,4 +51,14 @@ void ViewRenderer::renderPolygon(Polygon3D& poly, X3D_ColorIndex color) {
     }
 }
 
+void ViewRenderer::renderRay(Ray ray, X3D_ColorIndex color) {
+    X3D_Ray3D x3dRay = x3d_ray3d_make(
+        ray.v[0].toX3DVex3D(),
+        ray.v[1].toX3DVex3D()
+    );
+    
+    x3d_ray3d_render(&x3dRay, getCameraObject(), color);
+}
+
+
 

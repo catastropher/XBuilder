@@ -21,6 +21,7 @@
 #include "imgui/imgui.h"
 #include "../Window.hpp"
 #include "gui/ViewRenderer.hpp"
+#include "geo/Distance.hpp"
 
 #include "texture.hpp"
 
@@ -40,6 +41,7 @@ public:
     
     void beginRender() {
         x3d_screen_clear(0);
+        renderAxes();
     }
     
     void renderSegmentsInLevel() {
@@ -79,6 +81,23 @@ private:
         tex.h = screenman->h;
         
         return tex;
+    }
+    
+    void renderAxes() {
+        float size = Distance(10, Distance::FEET).toUnit(Distance::X3D_UNITS).dist;
+        
+        Vec3 origin(0, 0, 0);
+        Vec3 x(size, 0, 0);
+        Vec3 y(0, -size, 0);
+        Vec3 z(0, 0, size);
+        
+        X3D_ColorIndex red = 251;
+        X3D_ColorIndex green = 63;
+        X3D_ColorIndex blue = 208;
+        
+        ViewRenderer::renderRay(Ray(origin, x), red);
+        ViewRenderer::renderRay(Ray(origin, y), green);
+        ViewRenderer::renderRay(Ray(origin, z), blue);
     }
     
     void updateRenderOutputTexture() {
