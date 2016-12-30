@@ -78,5 +78,13 @@ struct Plane {
         normal = normal.neg();
         d = -d;
     }
+    
+    static Plane createHorizontal(float y, bool normalPointsUp) {
+        Plane plane;
+        plane.normal = Vec3(0, (normalPointsUp ? -1 : 1), 0);
+        plane.d = -plane.normal.dot(Vec3(0, y, 0));
+        
+        return plane;
+    }
 };
 

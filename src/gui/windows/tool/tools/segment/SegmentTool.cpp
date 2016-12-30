@@ -13,19 +13,15 @@
 // You should have received a copy of the GNU General Public License
 // along with XBuilder. If not, see <http://www.gnu.org/licenses/>.
 
-#include <X3D/X3D.h>
+#include "segmentools.hpp"
 
-#include "tools.hpp"
-
-void ToolManager::setSelectedToolGroup(std::string name) {
-    if(selectedToolGroup)
-        delete selectedToolGroup;
+void SegmentToolGroup::setSelectedTool(std::string name) {
+    if(selectedTool)
+        delete selectedTool;
     
-    if(name == "face")
-        selectedToolGroup = new FaceToolGroup(context);
-    else if(name == "segment")
-        selectedToolGroup = new SegmentToolGroup(context);
+    if(name == "create")
+        selectedTool = new CreateSegmentTool(context);
     else
-        selectedToolGroup = nullptr;
+        selectedTool = nullptr;
 }
 

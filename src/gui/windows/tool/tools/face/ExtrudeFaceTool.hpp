@@ -21,13 +21,16 @@
 class ExtrudeFaceTool : public FaceTool {
 public:
     ExtrudeFaceTool(ToolContext& context_) : FaceTool(context_),
-        extrudeDistanceWidget("Extrude Distance", Distance(10, Distance::FEET).toUnit(
-            context_.defaultDistanceUnit),
+        unitSelectorWidget(context_.defaultDistanceUnit),
+        extrudeDistanceWidget("Extrude Distance",
+            Distance(10, Distance::FEET),
             Distance(0, Distance::FEET), 
-            Distance(100, Distance::FEET)),
+            Distance(100, Distance::FEET),
+            unitSelectorWidget),
             extrudeType(EXTRUDE_NORMAL) { }
     
     void renderToolWindow() {
+        unitSelectorWidget.render();
         extrudeDistanceWidget.render();
         
         float extrudeDist = getExtrudeDistance();
@@ -178,6 +181,7 @@ private:
         return extrudeDistanceWidget.getDistance().toUnit(Distance::X3D_UNITS).dist;
     }
     
+    DistanceUnitSelectorWidget unitSelectorWidget;
     DistanceSliderInputWidget extrudeDistanceWidget;
     ExtrudeType extrudeType;
 };

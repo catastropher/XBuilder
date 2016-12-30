@@ -20,7 +20,7 @@
 
 class ScaleFaceTool : public FaceTool {
 public:
-    ScaleFaceTool(ToolContext& context_) : FaceTool(context_), scaleWidget("Scale %", 100, 1, 400) { }
+    ScaleFaceTool(ToolContext& context_) : FaceTool(context_), scaleWidget("Scale %", 100, 1, 400, "%.3f %%") { }
     
     void renderToolWindow() {
         scaleWidget.render();

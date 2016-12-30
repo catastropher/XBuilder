@@ -17,6 +17,9 @@
 #include "facetools.hpp"
 
 void FaceToolGroup::setSelectedTool(std::string name) {
+    if(selectedTool)
+        delete selectedTool;
+    
     if(name == "extrude")
         selectedTool = new ExtrudeFaceTool(context);
     else if(name == "scale")

@@ -37,6 +37,15 @@ struct Distance {
         return Distance(newDist, newUnit);
     }
     
+    static std::string getUnitShortName(Unit unit) {
+        if(unit == FEET)
+            return "ft";
+        else if(unit == METERS)
+            return "m";
+        
+        return "units";
+    }
+    
 private:
     float convertToX3DUnits() const {
         const float METERS_PER_FOOT = 3.28084;

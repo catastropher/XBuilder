@@ -21,6 +21,7 @@ add_executable(XBuilder
   
   src/gui/windows/tool/tools/ToolManager.cpp
   src/gui/windows/tool/tools/face/FaceTool.cpp
+  src/gui/windows/tool/tools/segment/SegmentTool.cpp
   
   src/pack/DirectoryScanner.cpp
   src/pack/ResourcePack.cpp

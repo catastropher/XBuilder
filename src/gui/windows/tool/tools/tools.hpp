@@ -19,4 +19,5 @@
 #include "ToolManager.hpp"
 
 #include "face/facetools.hpp"
+#include "segment/segmentools.hpp"
 
