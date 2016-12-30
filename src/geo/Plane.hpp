@@ -41,6 +41,8 @@ struct Plane {
         d = -p1.dot(normal);
     }
     
+    Plane(Vec3 normal_, Vec3 pointOnPlane) : normal(normal_), d(-normal_.dot(pointOnPlane)) { }
+    
     Plane(float a, float b, float c, float d_) {
         normal.x = a;
         normal.y = b;
@@ -79,12 +81,21 @@ struct Plane {
         d = -d;
     }
     
-    static Plane createHorizontal(float y, bool normalPointsUp) {
+    static Plane constructHorizontal(float y, bool normalPointsUp) {
         Plane plane;
         plane.normal = Vec3(0, (normalPointsUp ? -1 : 1), 0);
         plane.d = -plane.normal.dot(Vec3(0, y, 0));
         
         return plane;
+    }
+    
+    static Plane constructParallelToCameraView(X3D_CameraObject* cam, Vec3 pointOnPlane) {
+        X3D_Vex3D dir;
+        x3d_dynamicobject_forward_vector(&cam->base, &dir);
+        
+        Vec3 normal = Vec3(dir.x / 32768.0, dir.y / 32768.0, dir.z / 32768.0);
+        
+        return Plane(normal, pointOnPlane);
     }
 };
 

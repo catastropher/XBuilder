@@ -17,6 +17,7 @@ add_executable(XBuilder
   src/texture.cpp
   
   src/gui/gui.cpp
+  src/gui/widgets.cpp
   src/gui/ViewRenderer.cpp
   
   src/gui/windows/tool/tools/ToolManager.cpp

@@ -93,7 +93,7 @@ private:
         
         X3D_Vex2D pos = { (int)relativePos.x - 10, (int)relativePos.y - 30 };
         
-        currentMouseState = MouseState(ImGui::IsItemClicked(0), ImGui::IsItemClicked(1), pos, ImGui::IsItemHovered());
+        currentMouseState = MouseState(ImGui::IsItemClicked(0), ImGui::IsItemClicked(1), pos, ImGui::IsItemHovered(), { (int)windowPos.x, (int)windowPos.y});
     }
 };
 

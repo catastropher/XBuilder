@@ -20,14 +20,11 @@
 
 class ExtrudeFaceTool : public FaceTool {
 public:
-    ExtrudeFaceTool(ToolContext& context_) : FaceTool(context_),
+    ExtrudeFaceTool(ToolContext& context_) :
+        FaceTool(context_),
         unitSelectorWidget(context_.defaultDistanceUnit),
-        extrudeDistanceWidget("Extrude Distance",
-            Distance(10, Distance::FEET),
-            Distance(0, Distance::FEET), 
-            Distance(100, Distance::FEET),
-            unitSelectorWidget),
-            extrudeType(EXTRUDE_NORMAL) { }
+        extrudeDistanceWidget("Extrude Distance", DistanceRange(10, 0, 100, Distance::FEET), unitSelectorWidget),
+        extrudeType(EXTRUDE_NORMAL) { }
     
     void renderToolWindow() {
         unitSelectorWidget.render();

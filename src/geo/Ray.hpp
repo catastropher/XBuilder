@@ -38,5 +38,15 @@ struct Ray {
         Vec3 newDir = dir.reflectAboutNormal(normal);
         return Ray(intersectionPoint, intersectionPoint + newDir);
     }
+    
+    static Ray constructThroughPointOnScreen(X3D_Vex2D pointOnScreen, X3D_CameraObject* cam) {
+        X3D_Line3D line;
+        x3d_line3d_from_screen_point(&line, &pointOnScreen, cam, 15);
+        
+        Vec3 v0(line.start);
+        Vec3 v1 = v0 + Vec3(line.dir);
+        
+        return Ray(v0, v1);
+    }
 };
 

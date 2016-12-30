@@ -39,15 +39,7 @@ public:
     
     Raytracer(Level& level_, Ray ray_) : level(level_), ray(ray_) { }
     
-    Raytracer(Level& level_, X3D_CameraObject* cam, X3D_Vex2D pointOnScreen) : level(level_) {
-        X3D_Line3D line;
-        x3d_line3d_from_screen_point(&line, &pointOnScreen, cam, 15);
-        
-        Vec3 v0(line.start);
-        Vec3 v1 = v0 + Vec3(line.dir);
-        
-        ray = Ray(v0, v1);
-    }
+    Raytracer(Level& level_, X3D_CameraObject* cam, X3D_Vex2D pointOnScreen) : level(level_), ray(Ray::constructThroughPointOnScreen(pointOnScreen, cam)) { }
     
     bool findClosestIntersectedFace(FaceIntersection& result);
     

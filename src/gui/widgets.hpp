@@ -32,7 +32,7 @@ struct DropDownItem {
 class Widget {
 
 protected:
-    std::string generateUniqueId() {
+    static std::string generateUniqueId() {
         return "uniqueid" + std::to_string(nextUniqueId++);
     }
     
@@ -92,12 +92,23 @@ struct DropDownWidget : Widget {
 class FloatSliderInputWidget : Widget {
 public:
     FloatSliderInputWidget(std::string label_, float defaultValue, float minValue_, float maxValue_, std::string format_ = "%.3f")
-        : label(label_), value(defaultValue), minValue(minValue_), maxValue(maxValue_), selectedInputType(0), format(format_) { }
+        : label(label_),
+        value(defaultValue),
+        minValue(minValue_),
+        maxValue(maxValue_),
+        selectedInputType(0),
+        format(format_),
+        selectSliderId("Slider ##" + Widget::generateUniqueId()),
+        selectInputId("Input ##" + Widget::generateUniqueId())
+        {
+            
+        }
     
     void render() {
-        ImGui::RadioButton("Slider", &selectedInputType, 0);
+        ImGui::RadioButton(selectSliderId.c_str(), &selectedInputType, 0);
+        
         ImGui::SameLine();
-        ImGui::RadioButton("Input", &selectedInputType, 1);
+        ImGui::RadioButton(selectInputId.c_str(), &selectedInputType, 1);
         
         if(selectedInputType == 0)
             ImGui::SliderFloat(label.c_str(), &value, minValue, maxValue, format.c_str());
@@ -110,7 +121,14 @@ public:
     }
     
 protected:
-    FloatSliderInputWidget(std::string label_) : label(label_), selectedInputType(0) { }
+    FloatSliderInputWidget(std::string label_)
+    : label(label_),
+    selectedInputType(0),
+    selectSliderId("Slider ##" + Widget::generateUniqueId()),
+    selectInputId("Input ##" + Widget::generateUniqueId())
+    {
+        
+    }
     
     void setRange(float minValue_, float maxValue_) {
         minValue = minValue_;
@@ -132,6 +150,17 @@ private:
     float maxValue;
     int selectedInputType;
     std::string format;
+    std::string selectSliderId;
+    std::string selectInputId;
+};
+
+struct DistanceRange {
+    DistanceRange(float defaultValue, float minValue_, float maxValue_, Distance::Unit unit)
+        : minValue(minValue_, unit), maxValue(maxValue_, unit), defaultValue(defaultValue, unit) { }
+    
+    Distance minValue;
+    Distance maxValue;
+    Distance defaultValue;
 };
 
 class DistanceUnitSelectorWidget {
@@ -167,12 +196,11 @@ private:
 
 class DistanceSliderInputWidget : private FloatSliderInputWidget {
 public:
-    DistanceSliderInputWidget(std::string label_, Distance defaultValue, Distance minDistValue_, Distance maxDistValue_, DistanceUnitSelectorWidget& unitSelector) :
+    DistanceSliderInputWidget(std::string label_, DistanceRange range_, DistanceUnitSelectorWidget& unitSelector) :
         FloatSliderInputWidget(label_),
-        minDistValue(minDistValue_.toUnit(unitSelector.getCurrentUnit())),
-        maxDistValue(maxDistValue_.toUnit(unitSelector.getCurrentUnit())),
+        range(range_),
         unitSelectorWidget(unitSelector) {
-            setValue(defaultValue.dist);
+            setValue(range_.defaultValue.toUnit(unitSelector.getCurrentUnit()).dist);
             updateUnit();
         }
         
@@ -187,6 +215,14 @@ public:
         return Distance(getValue(), currentUnit());
     }
     
+    void setDistance(Distance distance) {
+        setValue(distance.toUnit(currentUnit()).dist);
+    }
+    
+    float getDistanceInUnits() const {
+        return Distance(getValue(), currentUnit()).toUnit(Distance::X3D_UNITS).dist;
+    }
+    
 private:
     Distance::Unit currentUnit() const {
         return unitSelectorWidget.getCurrentUnit();
@@ -198,16 +234,15 @@ private:
     
     void updateUnit() {
         setRange(
-            minDistValue.toUnit(currentUnit()).dist,
-            maxDistValue.toUnit(currentUnit()).dist
+            range.minValue.toUnit(currentUnit()).dist,
+            range.maxValue.toUnit(currentUnit()).dist
         );
         
         setValue(Distance(getValue(), previousUnit()).toUnit(currentUnit()).dist);
         setFormat("%.3f " + Distance::getUnitShortName(currentUnit()));
     }
     
-    Distance minDistValue;
-    Distance maxDistValue;
+    DistanceRange range;
     DistanceUnitSelectorWidget& unitSelectorWidget;
 };
 

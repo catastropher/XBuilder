@@ -13,20 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with XBuilder. If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
+#include "widgets.hpp"
 
-#include <X3D/X3D.h>
-
-struct MouseState {
-    bool leftPressed;
-    bool rightPressed;
-    X3D_Vex2D pos;
-    bool hoverInWindow;
-    X3D_Vex2D windowPos;
-    
-    MouseState(bool leftPressed_, bool rightPressed_, X3D_Vex2D pos_, bool hoverInWindow_, X3D_Vex2D windowPos_) :
-        leftPressed(leftPressed_), rightPressed(rightPressed_), pos(pos_), hoverInWindow(hoverInWindow_), windowPos(windowPos_) { }
-        
-    MouseState() : leftPressed(false), rightPressed(false), pos({ 0, 0 }), hoverInWindow(false) { }
-};
+int Widget::nextUniqueId = 0;
 

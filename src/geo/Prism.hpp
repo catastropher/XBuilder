@@ -95,7 +95,47 @@ struct Prism3D {
         return newGeometry;
     }
     
+    static Prism3D construct(int sidesInBase, float sideLength, float height, Vec3 rotAngle, Vec3 center) {
+        const float PI = 3.1415926535;
+        
+        float dAngle = 2 * PI / sidesInBase;
+        float angle = PI / 2 - dAngle / 2;
+        
+        Polygon3D baseA;
+        float radius = calculateRadiusFromSideLength(sideLength, sidesInBase);
+        
+        for(int i = 0; i < sidesInBase; ++i) {
+            baseA.addPoint(
+                Vec3(
+                    cos(angle) * radius,
+                    -height / 2,
+                    sin(angle) * radius
+                )
+            );
+            
+            angle += dAngle;
+        }
+        
+        Polygon3D baseB = baseA;
+        baseB.translate(Vec3(0, 1, 0) * height);
+        baseB.reverse();
+        
+        baseA.translate(center);
+        baseB.translate(center);
+        
+        Prism3D prism(sidesInBase);
+        prism.setFace(BASE_A, baseA);
+        prism.setFace(BASE_B, baseB);
+        
+        return prism;
+    }
+    
 private:
+    static float calculateRadiusFromSideLength(float sideLength, int sidesInBase) {
+        const float PI = 3.1415926535;
+        return sideLength / (2 * sin(PI  / sidesInBase)); 
+    }
+    
     Polygon3D getBaseA() const {
         Polygon3D poly;
         for(int i = 0; i < baseVertices(); ++i)
