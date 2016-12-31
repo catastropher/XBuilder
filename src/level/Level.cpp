@@ -44,6 +44,8 @@ Segment& LevelSegmentFace::extrude(float dist) {
 }
 
 Segment& LevelSegmentFace::extrude(Prism3D& newGeometry) {
-    return seg.getLevel().addSegment(newGeometry);
+    Segment& newSeg = seg.getLevel().addSegment(newGeometry);
+    connectToSegmentFace(newSeg.getFace(Prism3D::BASE_A));
+    return newSeg;
 }
 

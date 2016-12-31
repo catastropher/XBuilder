@@ -104,7 +104,7 @@ struct Level;
 
 class LevelSegmentFace {
 public:
-    LevelSegmentFace(Segment& seg_, int id_) : seg(seg_), id(id_) { }
+    LevelSegmentFace(Segment& seg_, int id_) : seg(seg_), id(id_), connectedFace(nullptr) { }
     
     Polygon3D getGeometry() const;
     LevelSegmentFace& operator=(const LevelSegmentFace& face);
@@ -120,9 +120,19 @@ public:
         return id;
     }
     
+    bool isConnectedToSegmentFace() const {
+        return connectedFace != nullptr;
+    }
+    
+    void connectToSegmentFace(LevelSegmentFace& face) {
+        connectedFace = &face;
+        face.connectedFace = this;
+    }
+    
 private:
     Segment& seg;
     int id;
+    LevelSegmentFace* connectedFace;
 };
 
 class Segment {

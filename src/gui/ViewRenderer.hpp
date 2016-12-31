@@ -23,8 +23,35 @@
 
 class ViewRenderer {
 public:
+    struct ViewRenderPrismFlags {
+        unsigned int renderFaceBitArray;
+        
+        ViewRenderPrismFlags(unsigned int renderFaceBitArray_) : renderFaceBitArray(renderFaceBitArray_) { }
+        ViewRenderPrismFlags() : renderFaceBitArray(0xFFFFFFFF) { }
+        
+        static ViewRenderPrismFlags renderNone() {
+            return ViewRenderPrismFlags(0);
+        }
+        
+        static ViewRenderPrismFlags renderAll() {
+            return ViewRenderPrismFlags();
+        }
+        
+        ViewRenderPrismFlags disableFace(int faceId) {
+            return ViewRenderPrismFlags(renderFaceBitArray & (~(1 << faceId)));
+        }
+        
+        ViewRenderPrismFlags enableFace(int faceId) {
+            return ViewRenderPrismFlags(renderFaceBitArray | (1 << faceId));
+        }
+        
+        bool faceIsEnabled(int faceId) const {
+            return (renderFaceBitArray & (1 << faceId)) != 0;
+        }
+    };
+    
     static void renderSegment(Segment& seg, X3D_ColorIndex color);
-    static void renderPrism3D(Prism3D& prism, X3D_ColorIndex color);
+    static void renderPrism3D(Prism3D& prism, X3D_ColorIndex color, ViewRenderPrismFlags flags = ViewRenderPrismFlags::renderAll());
     static void renderAllSegmentsInLevel(Level& level, X3D_ColorIndex color);
     static void renderPolygon(Polygon3D& poly, X3D_ColorIndex color);
     static void renderRay(Ray ray, X3D_ColorIndex color);

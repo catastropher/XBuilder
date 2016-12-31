@@ -41,6 +41,7 @@ public:
     
     void beginRender() {
         x3d_screen_clear(0);
+        x3d_screen_zbuf_clear();
         renderAxes();
     }
     

@@ -33,7 +33,7 @@ struct ToolContextColorPalette {
     
     ToolContextColorPalette() {
         geometryPreviewColor = getColorIndex(64, 64, 64);
-        primarySelectColor = getColorIndex(0, 0, 255);
+        primarySelectColor = 208; //getColorIndex(0, 0, 255);
     }
     
 private:

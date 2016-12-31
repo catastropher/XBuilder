@@ -72,5 +72,12 @@ struct Polygon3D {
             vertices[i] = (vertices[i] - center) * scale + center;
         }
     }
+    
+    void toX3DPolygon3D(X3D_Polygon3D& dest) {
+        dest.total_v = totalVertices();
+        
+        for(int i = 0; i < totalVertices(); ++i)
+            dest.v[i] = vertices[i].toX3DVex3D();
+    }
 };
 
