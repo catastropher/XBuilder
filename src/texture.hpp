@@ -20,30 +20,20 @@
 #include <string>
 #include <GLES3/gl3.h>
 
-class OpenGLTextureManager {
-private:
-    static std::vector<GLuint> loadedTextures;
-    
-    static std::vector<unsigned char> convertX3DTextureToByteArray(X3D_Texture* tex);
-    static GLuint uploadByteArrayTexture(std::vector<unsigned char>& texturePixels, int texWidth, int texHeight);
-    
+class OpenGLTextureManager {    
 public:
     static GLuint addX3DTexture(X3D_Texture* tex);
     static void updateX3DTexture(GLuint id, X3D_Texture* updatedTexture);
     
     ~OpenGLTextureManager();
+    
+private:
+    static std::vector<GLuint> loadedTextures;
+    static std::vector<unsigned char> convertX3DTextureToByteArray(X3D_Texture* tex);
+    static GLuint uploadByteArrayTexture(std::vector<unsigned char>& texturePixels, int texWidth, int texHeight);
 };
 
 class LevelTexture {
-private:
-    int id;
-    std::string name;
-    X3D_Texture texture;
-    GLuint glTextureId;
-    
-    void createOpenGLTexture();
-
-    
 public:
     LevelTexture(int id_, std::string name_, X3D_Texture tex) : id(id_), name(name_), texture(tex) {
         glTextureId = OpenGLTextureManager::addX3DTexture(&texture);
@@ -61,7 +51,7 @@ public:
         return name;
     }
     
-    const X3D_Texture getX3DTexture() const {
+    const X3D_Texture& getX3DTexture() const {
         return texture;
     }
    
@@ -74,23 +64,31 @@ public:
     ~LevelTexture() {
         x3d_texture_cleanup(&texture);
     }
+    
+private:
+    void createOpenGLTexture();
+    
+    int id;
+    std::string name;
+    X3D_Texture texture;
+    GLuint glTextureId;
 };
 
 class TextureManager {
+public:
+    static LevelTexture* loadTextureFromFile(std::string fileName);
+    static LevelTexture* addTexture(X3D_Texture tex, std::string fileName);
+    
+    static const std::vector<LevelTexture*>& getTextures() {
+        return textures;
+    }
+    
 private:
     static std::vector<LevelTexture*> textures;
     
     ~TextureManager() {
         for(int i = 0; i < (int)textures.size(); ++i)
             delete textures[i];
-    }
-    
-public:
-    static LevelTexture* loadTexture(std::string fileName);
-    static LevelTexture* addTexture(X3D_Texture tex, std::string fileName);
-    
-    static const std::vector<LevelTexture*>& getTextures() {
-        return textures;
     }
 };
 

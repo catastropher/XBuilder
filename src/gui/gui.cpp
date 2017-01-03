@@ -43,56 +43,131 @@ struct TexturePicker {
     vector<LevelTexture*> textures;
     LevelTexture* selectedTexture = NULL;
     char searchText[256] = "";
+    ImVec2 tileSize;
+    int horizontalSpacing;
+    bool isOpen;
     
-    TexturePicker(const vector<LevelTexture*>& textures_) : textures(textures_) { }
-    
-    void render() {
-        renderSelectedTexture();
-        renderSearch();
-        renderTextureButtons();
+    TexturePicker(const vector<LevelTexture*>& textures_) : textures(textures_), tileSize(128, 128), horizontalSpacing(10), isOpen(true) {
     }
     
-    void renderSelectedTexture() {
-        if(!selectedTexture)
-            return;
+    void render() {
+        ImGui::SetNextWindowSize(ImVec2((tileSize.x + horizontalSpacing) * 4 + 60, tileSize.x * 3));
+        if(ImGui::BeginPopupModal("Pick Texture", &isOpen)) {
+            renderSearch();
+            renderTextureButtons();
+            ImGui::EndPopup();
+        }
         
-        ImGui::Image(selectedTexture->getImguiId(), ImVec2(selectedTexture->getWidth(), selectedTexture->getHeight()));
-        ImGui::Text("%s", selectedTexture->getName().c_str());
-        ImGui::Separator();
+        //ImGui::OpenPopup("Pick Texture");
     }
     
     void renderSearch() {
         ImGui::InputText("Search", searchText, sizeof(searchText));
     }
     
+    
     void renderTextureButtons() {
         ImGui::BeginChild("textures");
         
         string search(searchText);
+        int count = 0;
+        
+        ImGui::Columns(4);
+        
         for(int i = 0; i < (int)textures.size(); ++i) {
-            if(textures[i]->getName().find(search) != string::npos)
-                renderTextureButton(textures[i], i);
+            if(textures[i]->getName().find(search) != string::npos) {
+                renderTextureButton(textures[i], i, (count % 4) != 3);
+                
+                ++count;
+                
+                if((i % 4) == 3) {
+                    for(int j = 0; j < 4; ++j) {
+                        if(i + j < (int)textures.size()) {
+                            char name[128];
+                            char spaces[128];
+                            
+                            string texName = textures[i + j]->getName();
+                            int width = 20;
+                            int space = width / 2 - texName.length() / 2;
+                            
+                            for(int k = 0; k < space; ++k)
+                                spaces[k] = ' ';
+                            
+                            spaces[space] = '\0';
+                            
+                            sprintf(name, "%s%s\n", spaces, textures[i + j]->getName().c_str());
+                            
+                            ImGui::Text("%.20s", name);
+                            ImGui::NextColumn();
+                        }
+                    }
+                    
+                    ImGui::Separator();
+                }
+                
+             }
         }
         
         ImGui::EndChild();
     }
     
-    void renderTextureButton(LevelTexture* tex, int id) {
+    ImVec2 calculateTextureButtonDimensions(LevelTexture* tex) const {
+        ImVec2 size(tex->getWidth(), tex->getHeight());
+        
+        if(size.x < tileSize.x && size.y < tileSize.y)
+            return size;
+        
+        float ratio = size.x / size.y;
+        
+        if(size.x > size.y)
+            return ImVec2(tileSize.x, tileSize.x / ratio);
+        
+        return ImVec2(tileSize.y * ratio, tileSize.y);
+    }
+    
+    void renderTextureButton(LevelTexture* tex, int id, bool sameLine) {
         char buttonId[64];
         sprintf(buttonId, "texbutton%d", id);
         
         ImGui::BeginGroup();
         
         ImGui::PushID(buttonId);
-        if(ImGui::ImageButton(tex->getImguiId(), ImVec2(tex->getWidth(), tex->getHeight()))) {
+        
+        ImVec2 dim = calculateTextureButtonDimensions(tex);
+        
+        float frameSize = 3;
+        ImVec4 backgroundColor = ImVec4(0, 0, 0, 0);
+        ImVec4 notSelectedColor = ImVec4(1, 1, 1, 1);
+        ImVec4 selectedColor = ImVec4(1, 1, 1, .5);
+        
+        bool selected = (tex == selectedTexture);
+        
+        if(!selected)
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+        else
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(.5, .5, .5, 1));
+        
+        //ImGuiCol_Button,
+        //ImGuiCol_ButtonHovered,
+        
+        if(ImGui::ImageButton(tex->getImguiId(), dim, ImVec2(0, 0), ImVec2(1, 1), frameSize)) {
             selectedTexture = tex;
         }
         
+        ImGui::PopStyleColor();
+        
         ImGui::PopID();
+        char text[16];
+        //sprintf(text, "%.13s", tex->getName().c_str());
         
-        ImGui::Text("%s", tex->getName().c_str());
         
+        //ImGui::Text(text, tex->getName().c_str());
         ImGui::EndGroup();
+        
+        ImGui::NextColumn();
+        
+        //if(sameLine)
+        //    ImGui::SameLine(0, tileSize.x - dim.x + 10);
     }
 };
 
@@ -133,7 +208,7 @@ void initGUI() {
     vector<string> files = scanner.recursivelyScanFiles();
     
     for(string file : files) {
-        //TextureManager::loadTexture(file);
+        //TextureManager::loadTextureFromFile(file);
     }
     
     TexturePicker picker(TextureManager::getTextures());
@@ -156,7 +231,7 @@ void initGUI() {
 //         bool show_another_window;
 //         ImGui::Begin("Another Window", &show_another_window);
         
-        //picker.render();
+        picker.render();
         
         guiManager.render();
         

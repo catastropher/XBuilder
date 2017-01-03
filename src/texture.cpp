@@ -16,11 +16,13 @@
 #include <string>
 #include <vector>
 #include <X3D/X3D.h>
+#include <boost/filesystem.hpp>
 
 #include "texture.hpp"
 #include "imgui/imgui.h"
 
 using namespace std;
+using namespace boost::filesystem;
 
 vector<GLuint> OpenGLTextureManager::loadedTextures;
 
@@ -84,18 +86,20 @@ LevelTexture* TextureManager::addTexture(X3D_Texture tex, string fileName) {
 }
 
 
-LevelTexture* TextureManager::loadTexture(string fileName) {
+LevelTexture* TextureManager::loadTextureFromFile(string fileName) {
     X3D_Texture x3dTex;
-    if(!x3d_texture_load_from_file(&x3dTex, fileName.c_str())) {
+    if(!x3d_texture_load_from_bmp_file(&x3dTex, fileName.c_str())) {
         return NULL;
     }
     
-    return addTexture(x3dTex, fileName);
+    string name = path(fileName).filename().string();
+    
+    int lastDotIndex = name.find_last_of("."); 
+    
+    if(lastDotIndex != string::npos) {
+        name = name.substr(0, lastDotIndex); 
+    }
+    
+    return addTexture(x3dTex, name);
 }
-
-void LevelTexture::renderInGUI() {
-    ImGui::ImageButton((void *)(size_t)glTextureId, ImVec2(getWidth(), getHeight()));
-    ImGui::Text("floor.tex");
-}
-
 
