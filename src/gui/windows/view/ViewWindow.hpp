@@ -32,11 +32,12 @@ private:
     GLuint renderTextureId;
     WindowContext& context;
     MouseState currentMouseState;
+    X3D_Texture screenTexture;
     
 public:
     ViewWindow(WindowContext& context_) : context(context_) {
-        X3D_Texture tex = createTextureForRenderOuput();
-        renderTextureId = OpenGLTextureManager::addX3DTexture(&tex);
+        screenTexture = *x3d_screenmanager_get_screen(x3d_screenmanager_get());
+        renderTextureId = OpenGLTextureManager::addX3DTexture(&screenTexture);
     }
     
     void beginRender() {
@@ -60,8 +61,7 @@ public:
         bool show_another_window = true;
         ImGui::Begin("X3D", &show_another_window, ImVec2(640, 480), -1.0f);
         
-        X3D_Texture tex = createTextureForRenderOuput();
-        ImGui::Image((void*)(size_t)renderTextureId, ImVec2(tex.w, tex.h));
+        ImGui::Image((void*)(size_t)renderTextureId, ImVec2(screenTexture.w, screenTexture.h));
         
         updateMouseState();
         
@@ -73,16 +73,6 @@ public:
     }
     
 private:
-    X3D_Texture createTextureForRenderOuput() {
-        X3D_ScreenManager* screenman = x3d_screenmanager_get();
-        X3D_Texture tex;
-        
-        tex.texels = screenman->buf;
-        tex.w = screenman->w;
-        tex.h = screenman->h;
-        
-        return tex;
-    }
     
     void renderAxes() {
         float size = Distance(10, Distance::FEET).toUnit(Distance::X3D_UNITS).dist;
@@ -102,8 +92,7 @@ private:
     }
     
     void updateRenderOutputTexture() {
-        X3D_Texture tex = createTextureForRenderOuput();
-        OpenGLTextureManager::updateX3DTexture(renderTextureId, &tex);
+        OpenGLTextureManager::updateX3DTexture(renderTextureId, &screenTexture);
     }
     
     void updateMouseState() {
