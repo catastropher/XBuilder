@@ -33,11 +33,14 @@ private:
     WindowContext& context;
     MouseState currentMouseState;
     X3D_Texture screenTexture;
+    X3D_Surface surface;
     
 public:
     ViewWindow(WindowContext& context_) : context(context_) {
         screenTexture = *x3d_screenmanager_get_screen(x3d_screenmanager_get());
         renderTextureId = OpenGLTextureManager::addX3DTexture(&screenTexture);
+        
+        x3d_surface_init(&surface, NULL);
     }
     
     void beginRender() {
@@ -51,10 +54,30 @@ public:
         ViewRenderer::renderAllSegmentsInLevel(context.level, red);
     }
     
+    void renderSandbox() {
+        X3D_Texture tex = TextureManager::getTextureByName("kstone3")->getX3DTexture();
+        
+        
+        static int angle = 0;
+        
+        X3D_TextureOrientation orientation;
+        orientation.angle = angle;
+        orientation.offset = x3d_vex2d_make(72, 72);
+        
+        x3d_surface_apply_primary_texture(&surface, &tex, &orientation);
+        
+        x3d_texture_blit(x3d_surface_texture(&surface), 0, 0);
+        
+        ++angle;
+    }
+    
     void renderWindow() {
         x3d_read_keys();
         
         x3d_keymanager_get()->key_handler();
+        
+        renderSandbox();
+        
         updateRenderOutputTexture();
         
         ImGui::SetNextWindowSize(ImVec2(640, 480), ImGuiSetCond_Always);

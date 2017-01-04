@@ -83,6 +83,15 @@ public:
         return textures;
     }
     
+    static LevelTexture* getTextureByName(std::string name) {
+        for(int i = 0; i < (int)textures.size(); ++i) {
+            if(textures[i]->getName() == name)
+                return textures[i];
+        }
+        
+        return nullptr;
+    }
+    
 private:
     static std::vector<LevelTexture*> textures;
     

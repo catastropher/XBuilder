@@ -22,6 +22,8 @@
 #include "imgui/imgui.h"
 #include "geo/Distance.hpp"
 
+#include "widgets/TexturePickerWidget.hpp"
+
 struct DropDownItem {
     std::string value;
     std::string displayName;
