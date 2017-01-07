@@ -15,8 +15,34 @@
 
 #pragma once
 
+#include "imgui/imgui.h"
 #include "FaceTool.hpp"
-#include "ExtrudeFaceTool.hpp"
-#include "ScaleFaceTool.hpp"
-#include "TextureFaceTool.hpp"
+
+class TextureFaceTool : public FaceTool {
+public:
+    TextureFaceTool(ToolContext& context_)
+    : FaceTool(context_, false),
+    texturePickerWidget(TextureManager::getTextures()),
+    offsetX(0),
+    offsetY(0),
+    angle(0)
+    {
+        
+    }
+    
+    void renderToolWindow() {
+        texturePickerWidget.render();
+        texturePickerWidget.renderOpenModalButton();
+        
+        ImGui::DragInt("Offset X", &offsetX, .1);
+        ImGui::DragInt("Offset Y", &offsetY, .1);
+        ImGui::DragInt("Angle", &angle, .1);
+    }
+    
+private:
+    TexturePickerWidget texturePickerWidget;
+    int offsetX;
+    int offsetY;
+    int angle;
+};
 

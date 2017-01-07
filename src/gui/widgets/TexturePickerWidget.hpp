@@ -28,12 +28,55 @@ public:
         : textures(textures_),
         selectedTexture(selectedTexture_),
         lastSelectedTexture(selectedTexture_),
+        finalSelectedTexture(selectedTexture_),
         tileSize(128, 128),
         horizontalSpacing(10),
         isOpen(false) {
             
         }
     
+    void render() {
+        ImGui::SetNextWindowSize(ImVec2((tileSize.x + horizontalSpacing) * 4 + 60, tileSize.x * 3));
+        if(ImGui::BeginPopupModal("Pick Texture", &isOpen)) {
+            renderSearch();
+            renderSelectButton();
+            renderTextureButtons();
+            ImGui::EndPopup();
+        }
+    }
+    
+    void show() {
+        isOpen = true;
+        lastSelectedTexture = finalSelectedTexture;
+        ImGui::OpenPopup("Pick Texture");
+    }
+    
+    bool selectedTextureChanged() const {
+        return finalSelectedTexture != lastSelectedTexture;
+    }
+    
+    LevelTexture* getSelectedTexture() const {
+        return finalSelectedTexture;
+    }
+    
+    void renderOpenModalButton() {
+        LevelTexture* tex = getSelectedTexture();
+        
+        if(tex) {
+            ImVec2 dim = calculateTextureButtonDimensions(tex);
+            
+            if(ImGui::ImageButton(tex->getImguiId(), dim)) {
+                show();
+            }
+        }
+        else {
+            if(ImGui::Button("Select Texture")) {
+                show();
+            }
+        }
+    }
+    
+private:
     std::vector<LevelTexture*> filterTextures() {
         std::vector<LevelTexture*> matches;
         
@@ -45,34 +88,15 @@ public:
         return matches;
     }
     
-    void render() {
-        ImGui::SetNextWindowSize(ImVec2((tileSize.x + horizontalSpacing) * 4 + 60, tileSize.x * 3));
-        if(ImGui::BeginPopupModal("Pick Texture", &isOpen)) {
-            renderSearch();
-            renderTextureButtons();
-            ImGui::EndPopup();
-        }
-    }
-    
-    void show() {
-        ImGui::OpenPopup("Pick Texture");
-    }
-    
-    bool selectedTextureChanged() const {
-        return selectedTexture != lastSelectedTexture;
-    }
-    
-    LevelTexture* getSelectedTexture() const {
-        return selectedTexture;
-    }
-    
-private:
     void renderSearch() {
         ImGui::InputText("Search", searchText, sizeof(searchText));
+    }
+    
+    void renderSelectButton() {
         ImGui::SameLine();
-        
         if(ImGui::Button("Select!")) {
             ImGui::CloseCurrentPopup();
+            finalSelectedTexture = selectedTexture;
         }
     }
     
@@ -162,7 +186,7 @@ private:
         else
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(.5, .5, .5, 1));
         
-        if(ImGui::ImageButton(tex->getImguiId(), dim, ImVec2(0, 0), ImVec2(1, 1)))
+        if(ImGui::ImageButton(tex->getImguiId(), dim))
             selectedTexture = tex;
         
         ImGui::PopStyleColor();
@@ -174,6 +198,7 @@ private:
     std::vector<LevelTexture*> textures;
     LevelTexture* selectedTexture;
     LevelTexture* lastSelectedTexture;
+    LevelTexture* finalSelectedTexture;
     char searchText[256] = "";
     ImVec2 tileSize;
     int horizontalSpacing;

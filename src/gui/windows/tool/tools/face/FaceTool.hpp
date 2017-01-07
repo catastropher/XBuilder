@@ -75,6 +75,7 @@ struct FaceToolGroup : ToolGroup {
         toolDropDown.addItem("extrude", "Extrude");
         toolDropDown.addItem("scale", "Scale");
         toolDropDown.addItem("connect", "Connect");
+        toolDropDown.addItem("texture", "Texture");
     }
     
     void setSelectedTool(std::string name);

@@ -24,6 +24,8 @@ void FaceToolGroup::setSelectedTool(std::string name) {
         selectedTool = new ExtrudeFaceTool(context);
     else if(name == "scale")
         selectedTool = new ScaleFaceTool(context);
+    else if(name == "texture")
+        selectedTool = new TextureFaceTool(context);
     else
         selectedTool = nullptr;
 }
