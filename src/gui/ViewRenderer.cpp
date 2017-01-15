@@ -14,6 +14,7 @@
 // along with XBuilder. If not, see <http://www.gnu.org/licenses/>.
 
 #include "ViewRenderer.hpp"
+#include "level/Level.hpp"
 
 void ViewRenderer::renderSegment(Segment& seg, X3D_ColorIndex color) {
     ViewRenderPrismFlags flags;
@@ -23,8 +24,14 @@ void ViewRenderer::renderSegment(Segment& seg, X3D_ColorIndex color) {
             flags = flags.disableFace(i);
     }
     
-    Prism3D prism = seg.getGeometry();
-    renderPrism3D(prism, color, flags);
+    for(int i = 0; i < seg.getGeometry().totalFaces(); ++i) {
+        if(flags.faceIsEnabled(i)) {
+            seg.getFace(i).renderWithSurface();
+        }
+    }
+    
+    //Prism3D prism = seg.getGeometry();
+    //renderPrism3D(prism, color, flags);
 }
 
 void ViewRenderer::renderPrism3D(Prism3D& prism, X3D_ColorIndex color, ViewRenderer::ViewRenderPrismFlags prismFlags) {
@@ -104,5 +111,14 @@ void ViewRenderer::renderRay(Ray ray, X3D_ColorIndex color) {
     x3d_ray3d_render(&x3dRay, getCameraObject(), color);
 }
 
+void ViewRenderer::renderPolygonSurface(X3D_Surface* surface, Polygon3D poly) {
+    X3D_Vex3D v[X3D_MAX_POINTS_IN_POLY];
+    X3D_Polygon3D x3dPoly;
+    
+    x3dPoly.v = v;
+    poly.toX3DPolygon3D(x3dPoly);
+    
+    x3d_surface_render_polygon(surface, &x3dPoly, getCameraObject());
+}
 
 

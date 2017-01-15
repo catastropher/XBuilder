@@ -17,9 +17,12 @@
 
 #include <X3D/X3D.h>
 
-#include "level/Level.hpp"
 #include "geo/Polygon.hpp"
 #include "geo/Prism.hpp"
+#include "render/X3D_surface.h"
+
+class Segment;
+class Level;
 
 class ViewRenderer {
 public:
@@ -55,6 +58,7 @@ public:
     static void renderAllSegmentsInLevel(Level& level, X3D_ColorIndex color);
     static void renderPolygon(Polygon3D& poly, X3D_ColorIndex color);
     static void renderRay(Ray ray, X3D_ColorIndex color);
+    static void renderPolygonSurface(X3D_Surface* surface, Polygon3D poly);
     
 private:
     static X3D_CameraObject* getCameraObject() {

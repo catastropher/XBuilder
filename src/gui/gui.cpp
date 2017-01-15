@@ -78,6 +78,7 @@ void initGUI() {
     }
     
     //TextureManager::loadTextureFromFile("tex/quaketex/kstone3.bmp");
+    //TextureManager::loadTextureFromFile("tex/quaketex/aperture.bmp");
     
     TexturePickerWidget picker(TextureManager::getTextures());
     

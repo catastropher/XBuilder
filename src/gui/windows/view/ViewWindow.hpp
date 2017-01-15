@@ -35,12 +35,34 @@ private:
     X3D_Texture screenTexture;
     X3D_Surface surface;
     
+    X3D_SurfaceTexture surfaceTextures[2];
+    X3D_Texture tex;
+    X3D_Texture aperture;
+    
 public:
     ViewWindow(WindowContext& context_) : context(context_) {
         screenTexture = *x3d_screenmanager_get_screen(x3d_screenmanager_get());
         renderTextureId = OpenGLTextureManager::addX3DTexture(&screenTexture);
+    
+        tex = TextureManager::getTextureByName("kstone3")->getX3DTexture();
+        surfaceTextures[0].tex = &tex;
+        surfaceTextures[0].angle = 0;
+        surfaceTextures[0].flags = 0;
+        surfaceTextures[0].offset = x3d_vex2d_make(0, 0);
+        surfaceTextures[0].scale = 256;
         
-        x3d_surface_init(&surface, NULL);
+        aperture = TextureManager::getTextureByName("aperture")->getX3DTexture();
+        surfaceTextures[1].tex = &aperture;
+        surfaceTextures[1].angle = 0;
+        surfaceTextures[1].flags = X3D_SURFACETEXTURE_IS_DECAL;
+        surfaceTextures[1].offset = x3d_vex2d_make(100, 100);
+        surfaceTextures[1].scale = 256;
+        
+        
+        surface.total_textures = 2;
+        surface.textures = surfaceTextures;
+        
+        //x3d_surface_init(&surface, NULL);
     }
     
     void beginRender() {
@@ -55,20 +77,8 @@ public:
     }
     
     void renderSandbox() {
-        X3D_Texture tex = TextureManager::getTextureByName("kstone3")->getX3DTexture();
-        
-        
-        static int angle = 0;
-        
-        X3D_TextureOrientation orientation;
-        orientation.angle = angle;
-        orientation.offset = x3d_vex2d_make(72, 72);
-        
-        x3d_surface_apply_primary_texture(&surface, &tex, &orientation);
-        
-        x3d_texture_blit(x3d_surface_texture(&surface), 0, 0);
-        
-        ++angle;
+        //x3d_surface_force_entire_rebuild(&surface);
+        //x3d_texture_blit(x3d_surface_texture(&surface), 0, 0);
     }
     
     void renderWindow() {

@@ -51,7 +51,7 @@ public:
         return name;
     }
     
-    const X3D_Texture& getX3DTexture() const {
+    X3D_Texture& getX3DTexture() {
         return texture;
     }
    

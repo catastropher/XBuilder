@@ -21,6 +21,7 @@
 
 #include "geo/geo.hpp"
 #include "texture.hpp"
+#include "gui/ViewRenderer.hpp"
 
 class Level;
     
@@ -102,9 +103,79 @@ private:
 struct Segment;
 struct Level;
 
+class LevelSurface {
+public:
+    LevelSurface(Polygon3D geometry) : hasPrimaryTexture_(false) {
+        X3D_Vex3D v[X3D_MAX_POINTS_IN_POLY];
+        X3D_Polygon3D poly;
+        poly.v = v;
+        
+        geometry.toX3DPolygon3D(poly);
+        x3d_surface_init(&surface, &poly);
+    }
+    
+    bool hasPrimaryTexture() const {
+        return hasPrimaryTexture_;
+    }
+    
+    X3D_SurfaceTexture& getPrimaryTexture() {
+        return primaryTexture;
+    }
+    
+    int totalDecals() const {
+        return decals.size();
+    }
+    
+    X3D_SurfaceTexture& getDecal(int id) {
+        return *decals[id];
+    }
+    
+    void setPrimaryTexture(X3D_SurfaceTexture tex) {
+        primaryTexture = tex;
+        hasPrimaryTexture_ = true;
+    }
+    
+    X3D_Surface& getSurface() {
+        return surface;
+    }
+    
+    void rebuildSurface() {
+        rebuildSurfaceTextures();
+        x3d_surface_force_entire_rebuild(&surface);
+    }
+    
+    ~LevelSurface() {
+        x3d_surface_cleanup(&surface);
+    }
+    
+private:
+    void rebuildSurfaceTextures() {
+        surfaceTextures.clear();
+        
+        if(hasPrimaryTexture_) {
+            surfaceTextures.push_back(primaryTexture);
+        }
+        
+        for(int i = 0; i < (int)decals.size(); ++i) {
+            if(decals[i]) {
+                surfaceTextures.push_back(*decals[i]);
+            }
+        }
+        
+        surface.total_textures = surfaceTextures.size();
+        surface.textures = &surfaceTextures[0];
+    }
+    
+    X3D_Surface surface;
+    X3D_SurfaceTexture primaryTexture;
+    bool hasPrimaryTexture_;
+    std::vector<X3D_SurfaceTexture*> decals;
+    std::vector<X3D_SurfaceTexture> surfaceTextures;
+};
+
 class LevelSegmentFace {
 public:
-    LevelSegmentFace(Segment& seg_, int id_) : seg(seg_), id(id_), connectedFace(nullptr) { }
+    LevelSegmentFace(Segment& seg_, int id_) : seg(seg_), id(id_), connectedFace(nullptr), surface(getGeometry()) { }
     
     Polygon3D getGeometry() const;
     LevelSegmentFace& operator=(const LevelSegmentFace& face);
@@ -129,10 +200,19 @@ public:
         face.connectedFace = this;
     }
     
+    void renderWithSurface() {
+        ViewRenderer::renderPolygonSurface(&surface.getSurface(), getGeometry());
+    }
+    
+    LevelSurface& getSurface() {
+        return surface;
+    }
+    
 private:
     Segment& seg;
     int id;
     LevelSegmentFace* connectedFace;
+    LevelSurface surface;
 };
 
 class Segment {
