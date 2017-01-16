@@ -49,3 +49,11 @@ Segment& LevelSegmentFace::extrude(Prism3D& newGeometry) {
     return newSeg;
 }
 
+void Segment::updateGeometry(Prism3D& updatedGeometry) {
+    geometry.updateGeometry(updatedGeometry);
+    
+    // TODO: in future we shouldn't rebuild all surfaces
+    level.rebuildAllSurfaces();
+}
+
+

@@ -27,8 +27,8 @@ public:
         SegmentTool(context_, false),
         unitSelectorWidget(context_.defaultDistanceUnit),
         sidesWidget("Sides in Base", 4, 3, 10, "%.0f sides"),
-        lengthWidget("Side Length", DistanceRange(10, 1, 100, Distance::FEET), unitSelectorWidget),
-        heightWidget("Height", DistanceRange(10, 1, 100, Distance::FEET), unitSelectorWidget),
+        lengthWidget("Side Length", DistanceRange(8, 1, 100, Distance::FEET), unitSelectorWidget),
+        heightWidget("Height", DistanceRange(8, 1, 100, Distance::FEET), unitSelectorWidget),
         elevationWidget("Center Elevation", DistanceRange(0, -1000, 1000, Distance::FEET), unitSelectorWidget),
         showPreview(false)
         { }

@@ -51,8 +51,11 @@ public:
         ImGui::OpenPopup("Pick Texture");
     }
     
-    bool selectedTextureChanged() const {
-        return finalSelectedTexture != lastSelectedTexture;
+    bool selectedTextureChanged() {
+        bool changed = finalSelectedTexture != lastSelectedTexture;
+        lastSelectedTexture = finalSelectedTexture;
+        
+        return changed;
     }
     
     LevelTexture* getSelectedTexture() const {
@@ -74,6 +77,12 @@ public:
                 show();
             }
         }
+    }
+    
+    void setSelectedTexture(LevelTexture* tex) {
+        selectedTexture = tex;
+        lastSelectedTexture = tex;
+        finalSelectedTexture = tex;
     }
     
 private:

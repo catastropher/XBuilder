@@ -114,6 +114,17 @@ public:
         x3d_surface_init(&surface, &poly);
     }
     
+    void updateSurfaceGeometry(Polygon3D geometry) {
+        X3D_Vex3D v[X3D_MAX_POINTS_IN_POLY];
+        X3D_Polygon3D poly;
+        poly.v = v;
+        
+        geometry.toX3DPolygon3D(poly);
+        x3d_surface_update_geometry(&surface, &poly);
+        
+        rebuildSurface();
+    }
+    
     bool hasPrimaryTexture() const {
         return hasPrimaryTexture_;
     }
@@ -208,6 +219,10 @@ public:
         return surface;
     }
     
+    void rebuildSurface() {
+        surface.updateSurfaceGeometry(getGeometry());
+    }
+    
 private:
     Segment& seg;
     int id;
@@ -227,9 +242,7 @@ public:
         return geometry.getGeometry();
     }
     
-    void updateGeometry(Prism3D& updatedGeometry) {
-        geometry.updateGeometry(updatedGeometry);
-    }
+    void updateGeometry(Prism3D& updatedGeometry);
     
     bool isDeleted() const {
         return deleted;
@@ -243,6 +256,10 @@ public:
         deleted = false;
     }
     
+    int totalFaces() const {
+        return geometry.totalFaces();
+    }
+    
     Level& getLevel() const {
         return level;
     }
@@ -251,6 +268,12 @@ public:
     
     LevelSegmentFace& getFace(int faceId) {
         return *faces[faceId];
+    }
+    
+    void rebuildSurfaces() {
+        for(int i = 0; i < totalFaces(); ++i) {
+            faces[i]->rebuildSurface();
+        }
     }
     
     ~Segment() {
@@ -340,6 +363,12 @@ public:
     
     Segment& getSegment(int id) const {
         return *segments[id];
+    }
+    
+    void rebuildAllSurfaces() {
+        for(SegmentIterator i = segmentBegin(); i != segmentEnd(); ++i) {
+            i->rebuildSurfaces();
+        }
     }
     
     ~Level() {

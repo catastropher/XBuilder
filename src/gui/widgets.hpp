@@ -122,6 +122,10 @@ public:
         return value;
     }
     
+    void setValue(float val) {
+        value = val;
+    }
+    
 protected:
     FloatSliderInputWidget(std::string label_)
     : label(label_),
@@ -135,10 +139,6 @@ protected:
     void setRange(float minValue_, float maxValue_) {
         minValue = minValue_;
         maxValue = maxValue_;
-    }
-    
-    void setValue(float val) {
-        value = val;
     }
     
     void setFormat(std::string format_) {

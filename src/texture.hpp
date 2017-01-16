@@ -92,6 +92,15 @@ public:
         return nullptr;
     }
     
+    static LevelTexture* getTextureByTextureAddress(X3D_Texture* tex) {
+        for(int i = 0; i < (int)textures.size(); ++i) {
+            if(&textures[i]->getX3DTexture() == tex)
+                return textures[i];
+        }
+        
+        return nullptr;
+    }
+    
 private:
     static std::vector<LevelTexture*> textures;
     
