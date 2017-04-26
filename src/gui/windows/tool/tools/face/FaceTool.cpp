@@ -26,6 +26,8 @@ void FaceToolGroup::setSelectedTool(std::string name) {
         selectedTool = new ScaleFaceTool(context);
     else if(name == "texture")
         selectedTool = new TextureFaceTool(context);
+    else if(name == "decal-texture")
+        selectedTool = new DecalTextureFaceTool(context);
     else
         selectedTool = nullptr;
 }

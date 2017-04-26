@@ -141,6 +141,13 @@ public:
         return *decals[id];
     }
     
+    X3D_SurfaceTexture& addNewDecalTexture(X3D_SurfaceTexture tex) {
+        X3D_SurfaceTexture* decal = new X3D_SurfaceTexture(tex);
+        decals.push_back(decal);
+        
+        return *decal;
+    }
+    
     void setPrimaryTexture(X3D_SurfaceTexture tex) {
         primaryTexture = tex;
         hasPrimaryTexture_ = true;
@@ -153,6 +160,15 @@ public:
     void rebuildSurface() {
         rebuildSurfaceTextures();
         x3d_surface_force_entire_rebuild(&surface);
+    }
+    
+    X3D_Vex2D projectPointInSurfaceCoordinateSystem(Vec3 v) const {
+        X3D_Vex3D x3dV = v.toX3DVex3D();
+        return x3d_orientation3d_transform_point(&surface.orientation, x3dV);
+    }
+    
+    bool validPointInSurfaceCoordinateSystem(X3D_Vex2D v) const {
+        return v.x >= 0 && v.x < x3d_surface_w(&surface) && v.y >= 0 && v.y < x3d_surface_h(&surface);
     }
     
     ~LevelSurface() {

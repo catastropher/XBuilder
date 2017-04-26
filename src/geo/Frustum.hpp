@@ -35,6 +35,14 @@ struct Frustum {
             f.addPlane(Plane(point, poly.vertices[nextVertex], poly.vertices[i]));
         }
         
+        Vec3 center = poly.calculateCenter();
+        
+        if(!f.pointIsInsideOf(center)) {
+            for(int i = 0; i < poly.totalVertices(); ++i) {
+                f.planes[i].flipDirection();
+            }
+        }
+        
         return f;
     }
     

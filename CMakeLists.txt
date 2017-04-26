@@ -26,6 +26,7 @@ add_executable(XBuilder
   
   src/pack/DirectoryScanner.cpp
   src/pack/ResourcePack.cpp
+  src/pack/IndexedFile.cpp
   
   src/imgui/imgui_impl_sdl_gl3.cpp
   src/imgui/imgui.cpp

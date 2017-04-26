@@ -36,8 +36,10 @@ Raytracer::FaceIntersection Raytracer::findClosestIntersectionForSegment(Segment
         Polygon3D face = geometry.getFace(i);
         PlaneIntersection planeIntersection;
         
-        if(face.rayIntersectsPolygon(ray, planeIntersection))
+        if(face.rayIntersectsPolygon(ray, planeIntersection)) {
+            x3d_log(X3D_INFO, "HIT POLY!");
             closestIntersection = std::min(closestIntersection, FaceIntersection(planeIntersection, &seg.getFace(i)));
+        }
     }
     
     return closestIntersection;

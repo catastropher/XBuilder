@@ -31,14 +31,24 @@ public:
     
     virtual void updateSelectedFace() { }
     
-    virtual void viewWindowHandleMouse(MouseState& state) {
+    Raytracer::FaceIntersection findFaceUnderMouse(MouseState& state) {
         X3D_CameraObject* viewCamera = x3d_playermanager_get()->player[0].cam;
+        Raytracer::FaceIntersection intersection;
         
+        
+        Raytracer raytracer(context.level, viewCamera, state.pos);
+        raytracer.findClosestIntersectedFace(intersection);
+        return intersection;
+    }
+    
+    virtual void viewWindowHandleMouse(MouseState& state) {
         if(state.leftPressed) {
-            Raytracer raytracer(context.level, viewCamera, state.pos);
+            Raytracer::FaceIntersection intersection = findFaceUnderMouse(state);
             
-            if(raytracer.findClosestIntersectedFace(selectedFace))
+            if(intersection.validIntersection()) {
+                selectedFace = intersection;
                 updateSelectedFace();
+            }
         }
     }
     
@@ -75,7 +85,8 @@ struct FaceToolGroup : ToolGroup {
         toolDropDown.addItem("extrude", "Extrude");
         toolDropDown.addItem("scale", "Scale");
         toolDropDown.addItem("connect", "Connect");
-        toolDropDown.addItem("texture", "Texture");
+        toolDropDown.addItem("texture", "Primary Texture");
+        toolDropDown.addItem("decal-texture", "Decal Texture");
     }
     
     void setSelectedTool(std::string name);

@@ -19,4 +19,5 @@
 #include "ExtrudeFaceTool.hpp"
 #include "ScaleFaceTool.hpp"
 #include "TextureFaceTool.hpp"
+#include "DecalTextureFaceTool.hpp"
 
