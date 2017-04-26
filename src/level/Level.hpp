@@ -39,13 +39,8 @@ struct LevelPrism {
 public:
     LevelPrism(std::vector<Vertex*> vertices_) : vertices(vertices_) { }
     
-    int baseVertices() const {
-        return vertices.size() / 2;
-    }
-    
-    int totalFaces() const {
-        return baseVertices() + 2;
-    }
+    int baseVertices() const { return vertices.size() / 2; }
+    int totalFaces() const { return baseVertices() + 2; }
     
     Prism3D getGeometry() const {
         std::vector<Vec3> v;
@@ -208,19 +203,12 @@ public:
     LevelSegmentFace& operator=(const LevelSegmentFace& face);
     Segment& extrude(float dist);
     Segment& extrude(Prism3D& newGeometry);
+    LevelSurface& getSurface() { return surface; }
+    Segment& getSeg() const { return seg; }
     
+    int getId() const { return id; }
     
-    Segment& getSeg() const {
-        return seg;
-    }
-    
-    int getId() const {
-        return id;
-    }
-    
-    bool isConnectedToSegmentFace() const {
-        return connectedFace != nullptr;
-    }
+    bool isConnectedToSegmentFace() const { return connectedFace != nullptr; }
     
     void connectToSegmentFace(LevelSegmentFace& face) {
         connectedFace = &face;
@@ -229,10 +217,6 @@ public:
     
     void renderWithSurface() {
         ViewRenderer::renderPolygonSurface(&surface.getSurface(), getGeometry());
-    }
-    
-    LevelSurface& getSurface() {
-        return surface;
     }
     
     void rebuildSurface() {
@@ -249,10 +233,12 @@ private:
 class Segment {
 public:
     Segment(const Segment& seg) = default;
-    Segment(Level& level_, LevelPrism& geometry_, int id_) : level(level_), geometry(geometry_), id(id_), deleted(false) {
-        for(int i = 0; i < geometry_.totalFaces(); ++i)
-            faces.push_back(new LevelSegmentFace(*this, i));
-    }
+    Segment(Level& level_, LevelPrism& geometry_, int id_)
+        : level(level_), geometry(geometry_), id(id_), deleted(false)
+        {
+            for(int i = 0; i < geometry_.totalFaces(); ++i)
+                faces.push_back(new LevelSegmentFace(*this, i));
+        }
     
     Prism3D getGeometry() const {
         return geometry.getGeometry();
@@ -260,31 +246,15 @@ public:
     
     void updateGeometry(Prism3D& updatedGeometry);
     
-    bool isDeleted() const {
-        return deleted;
-    }
+    bool isDeleted() const { return deleted; }
+    int totalFaces() const { return geometry.totalFaces(); }
+    LevelSegmentFace& getFace(int faceId) { return *faces[faceId]; }
+    Level& getLevel() const { return level; }
     
-    void deleteSelf() {
-        deleted = true;
-    }
-    
-    void undeleteSelf() {
-        deleted = false;
-    }
-    
-    int totalFaces() const {
-        return geometry.totalFaces();
-    }
-    
-    Level& getLevel() const {
-        return level;
-    }
+    void deleteSelf() { deleted = true; }
+    void undeleteSelf() { deleted = false; }
     
     Segment& operator=(const Segment& seg);
-    
-    LevelSegmentFace& getFace(int faceId) {
-        return *faces[faceId];
-    }
     
     void rebuildSurfaces() {
         for(int i = 0; i < totalFaces(); ++i) {
@@ -329,43 +299,27 @@ public:
             return *this;
         }
         
-        bool operator==(const SegmentIterator& segIterator) const {
-            return seg == segIterator.seg;
-        }
-        
-        bool operator!=(const SegmentIterator& segIterator) const {
-            return !(*this == segIterator);
-        }
+        bool operator==(const SegmentIterator& segIterator) const { return seg == segIterator.seg; }
+        bool operator!=(const SegmentIterator& segIterator) const { return !(*this == segIterator); }
         
         SegmentIterator& operator++() {
             *this = this->next();
             return *this;
         }
         
-        Segment& operator*() const {
-            return **seg;
-        }
-        
-        Segment* operator->() const {
-            return *seg;
-        }
+        Segment& operator*() const { return **seg; }
+        Segment* operator->() const { return *seg; }
         
     private:
-        bool shouldSkipDeletedSegment(Segment** s) const {
-            return s < end && (*s)->isDeleted();
-        }
+        bool shouldSkipDeletedSegment(Segment** s) const { return s < end && (*s)->isDeleted(); }
         
         Segment** seg;
         Segment** end;
     };
     
-    SegmentIterator segmentBegin() {
-        return SegmentIterator(&segments[0], &segments[segments.size()]);
-    }
-    
-    SegmentIterator segmentEnd() {
-        return SegmentIterator(&segments[segments.size()], &segments[segments.size()]);
-    }
+    Segment& getSegment(int id) const { return *segments[id]; }
+    SegmentIterator segmentBegin() {return SegmentIterator(&segments[0], &segments[segments.size()]); }
+    SegmentIterator segmentEnd() { return SegmentIterator(&segments[segments.size()], &segments[segments.size()]); }
     
     
     Segment& addSegment(Prism3D& geometry) {
@@ -375,10 +329,6 @@ public:
         segments.push_back(newSegment);
         
         return *newSegment;
-    }
-    
-    Segment& getSegment(int id) const {
-        return *segments[id];
     }
     
     void rebuildAllSurfaces() {
@@ -396,5 +346,4 @@ private:
     VertexManager vertexManager;
     std::vector<Segment*> segments;
 };
-
 
