@@ -22,7 +22,9 @@
 
 using namespace std;
 
-void init() {
+void xbuilder_handle_keys(void);
+
+void initX3d() {
     X3D_InitSettings init = {
         .screen_w = 640,
         .screen_h = 480,
@@ -33,46 +35,8 @@ void init() {
     };
     
     x3d_init(&init);
-}
-
-
-X3D_Texture checkerboard;
-X3D_LightMapContext lightmap_context;
-
-extern X3D_Level* global_level;
-int16 creation_plane_y;
-
-
-void xbuilder_handle_keys(void);
-
-//extern ToolManager* globalToolState;
-
-#include "level/Level.hpp"
-
-Level globalLevel;
-
-
-extern "C" void test_render_callback(X3D_CameraObject* cam) {
-    //x3d_render_3d_grid(cam, x3d_vex3d_make(0, creation_plane_y, 0), 100, 20, 20);
-    //handle_mouse_callback(cam);
     
-    //render_level(global_level, cam);
-    
-    //globalToolState->renderLevel(cam);
-}
-
-#include "pack/ResourcePack.hpp"
-#include "level/LevelCommand.hpp"
-
-void initGUI();
-
-int main() {    
-    init();
-    
-    //setup_key_map();
-
     x3d_rendermanager_set_render_mode(X3D_RENDER_NONE);
-    
     x3d_keymanager_set_callback(xbuilder_handle_keys);
     
     x3d_camera_init();
@@ -83,6 +47,17 @@ int main() {
     cam->base.base.pos.z = -500 * 256;
     cam->base.base.pos.x = 0;
     cam->base.base.pos.y = -50 * 256;
+}
+
+// For dumb reasons this needs to be here
+extern "C" void test_render_callback(X3D_CameraObject* cam) { }
+
+// Again, for reasons that are even more dumb, these two globals need to be here as well
+X3D_Texture checkerboard;
+X3D_LightMapContext lightmap_context;
+
+int main() {    
+    initX3d();
     
     MainWindowManager mainWindowManager;
     mainWindowManager.openMainWindow();
@@ -91,9 +66,7 @@ int main() {
     context.enterMainLoop();
     
     mainWindowManager.closeMainWindow();
-    
-    
+        
     x3d_cleanup();
 }
-
 
