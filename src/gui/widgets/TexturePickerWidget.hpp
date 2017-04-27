@@ -204,7 +204,7 @@ private:
         ImGui::EndGroup();
     }
     
-    std::vector<LevelTexture*> textures;
+    const std::vector<LevelTexture*>& textures;
     LevelTexture* selectedTexture;
     LevelTexture* lastSelectedTexture;
     LevelTexture* finalSelectedTexture;

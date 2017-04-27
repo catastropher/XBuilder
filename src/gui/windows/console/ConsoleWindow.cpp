@@ -29,6 +29,9 @@ void ConsoleWindow::render() {
     
     ImGui::TextUnformatted(&consoleText[0], &consoleText[consoleText.length() - 1]);
     
+    if(console.hasNewTextToDisplay())
+        ImGui::SetScrollHere(1.0);
+    
     ImGui::EndChild();
     
     ImGui::Separator();

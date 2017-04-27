@@ -24,5 +24,6 @@ namespace ConsoleCommands {
     
 void commandClear(ConsoleCommandContext& context, std::vector<std::string>& args);
 void commandEcho(ConsoleCommandContext& context, std::vector<std::string>& args);
-    
+void commandImportTex(ConsoleCommandContext& context, std::vector<std::string>& args);
+
 };

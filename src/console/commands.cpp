@@ -15,8 +15,13 @@
 
 #include <vector>
 #include <string>
+#include <boost/filesystem.hpp>
 
 #include "Console.hpp"
+#include "pack/DirectoryScanner.hpp"
+#include "XBuilderContext.hpp"
+
+using namespace std;
 
 namespace ConsoleCommands {
 
@@ -30,6 +35,27 @@ void commandEcho(ConsoleCommandContext& context, std::vector<std::string>& args)
         context.console.print(arg + "\n");
     
     context.console.print("\n");
+}
+
+void commandImportTex(ConsoleCommandContext& context, std::vector<std::string>& args) {
+    if(args.size() == 0)
+        throw "Expected directory to scan for bitmaps";
+    
+    try {
+        string directory = args[0];
+        DirectoryScanner scanner(boost::filesystem::path(directory), false);
+        auto files = scanner.recursivelyScanFiles();
+        
+        for(auto file : files) {
+            context.console.printLine("Loading file: " + file);
+            context.context.getProject().getTextureManager().loadTextureFromFile(file);
+        }
+        
+        context.console.printLine("Done.");
+    }
+    catch(boost::filesystem::filesystem_error err) {
+        throw "Could not open directory " + args[0];
+    }
 }
     
 };

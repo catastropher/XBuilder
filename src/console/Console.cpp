@@ -19,7 +19,7 @@
 using namespace ConsoleCommands;
 using namespace std;
 
-Console::Console(XBuilderContext& context_) : context(context_) {
+Console::Console(XBuilderContext& context_) : context(context_), hasNewText(false) {
     addCommand(
         "clear",
         "Clears the console",
@@ -30,6 +30,12 @@ Console::Console(XBuilderContext& context_) : context(context_) {
         "echo",
         "Echos text to the console",
         commandEcho
+    );
+    
+    addCommand(
+        "import-tex",
+        "Imports bitmaps as textures from a directory",
+        commandImportTex
     );
 }
 

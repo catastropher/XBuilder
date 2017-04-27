@@ -51,10 +51,15 @@ class Console {
 public:
     Console(XBuilderContext& context_);
     
-    void print(std::string str) { output += str; }
+    void print(std::string str) {
+        output += str;
+        hasNewText = true;
+    }
+    
     void printLine(std::string str) {
         output += str;
         output += '\n';
+        hasNewText = true;
     }
     
     void print(const char* format, ...) {
@@ -65,10 +70,19 @@ public:
         vsprintf(buf, format, list);
         
         output.append(buf);
+        
+        hasNewText = true;
     }
     
     void clear() {
         output.clear();
+        hasNewText = true;
+    }
+    
+    bool hasNewTextToDisplay() {
+        bool newText = hasNewText;
+        hasNewText = false;
+        return newText;
     }
     
     std::string& getOutput() { return output; }
@@ -85,5 +99,6 @@ private:
     XBuilderContext& context;
     std::string output;
     std::map<std::string, ConsoleCommand> commands;
+    bool hasNewText;
 };
 
