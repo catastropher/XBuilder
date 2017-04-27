@@ -20,6 +20,7 @@
 
 #include "gui/GuiManager.hpp"
 #include "gui/MainWindowManager.hpp"
+#include "console/Console.hpp"
 
 class XBuilderContext;
 
@@ -49,7 +50,8 @@ public:
     XBuilderContext(MainWindowManager& mainWindowManager_)
         : mainWindowManager(mainWindowManager_),
         currentProject(nullptr), 
-        guiManager(nullptr)
+        guiManager(nullptr),
+        console(*this)
         {
             createNewProject();
         }
@@ -89,6 +91,14 @@ public:
         }
     }
     
+    Project& getProject() {
+        return *currentProject;
+    }
+    
+    Console& getConsole() {
+        return console;
+    }
+    
     ~XBuilderContext() {
         releaseCurrentState();
     }
@@ -103,12 +113,13 @@ private:
         releaseCurrentState();
         
         currentProject = newCurrentProject;
-        guiManager = new GuiManager(*currentProject);
+        guiManager = new GuiManager(*this);
     }
     
     MainWindowManager& mainWindowManager;
     Project* currentProject;
     GuiManager* guiManager;
+    Console console;
     
     std::queue<XBuilderContextEvent*> eventQueue;
     

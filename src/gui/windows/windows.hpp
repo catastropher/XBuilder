@@ -18,4 +18,4 @@
 #include "Window.hpp"
 #include "view/ViewWindow.hpp"
 #include "tool/ToolWindow.hpp"
-
+#include "console/ConsoleWindow.hpp"

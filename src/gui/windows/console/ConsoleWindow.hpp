@@ -15,26 +15,18 @@
 
 #pragma once
 
-#include "gui/MouseState.hpp"
-#include "level/Level.hpp"
-#include "project/Project.hpp"
+#include "imgui/imgui.h"
 
-class XBuilderContext;
+#include "../Window.hpp"
+#include "console/Console.hpp"
 
-struct WindowContext {
-    WindowContext(XBuilderContext& context_);
-    
-    XBuilderContext& context;
-    Project& project;
-};
-
-class Window {
+class ConsoleWindow : public Window {
 public:
-    virtual void render() = 0;
+    ConsoleWindow(WindowContext& context_);
     
-    Window(WindowContext& context_) : context(context_) { }
+    void render();
     
-protected:
-    WindowContext context;
+private:
+    char inputBuf[1024];
 };
 

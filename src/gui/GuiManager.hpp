@@ -17,10 +17,17 @@
 
 #include "level/Level.hpp"
 #include "windows/windows.hpp"
+#include "XBuilderContext.hpp"
 
 struct GuiManager {
 public:
-    GuiManager(Project& project) : context(project), toolWindow(context), viewWindow(context) { }
+    GuiManager(XBuilderContext& context_)
+        : context(context_),
+        toolWindow(context),
+        viewWindow(context),
+        consoleWindow(context)
+        {
+        }
     
     void render() {
         viewWindow.beginRender();
@@ -32,11 +39,13 @@ public:
         toolWindow.render();
         
         viewWindow.renderWindow();
+        consoleWindow.render();
     }
     
 private:
     WindowContext context;
     ToolWindow toolWindow;
     ViewWindow viewWindow;
+    ConsoleWindow consoleWindow;
 };
 

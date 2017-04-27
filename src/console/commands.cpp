@@ -13,28 +13,23 @@
 // You should have received a copy of the GNU General Public License
 // along with XBuilder. If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
+#include <vector>
+#include <string>
 
-#include "gui/MouseState.hpp"
-#include "level/Level.hpp"
-#include "project/Project.hpp"
+#include "Console.hpp"
 
-class XBuilderContext;
+namespace ConsoleCommands {
 
-struct WindowContext {
-    WindowContext(XBuilderContext& context_);
+void commandClear(ConsoleCommandContext& context, std::vector<std::string>& args) {
+    printf("Console cleared\n");
+    context.console.clear();
+}
+
+void commandEcho(ConsoleCommandContext& context, std::vector<std::string>& args) {
+    for(auto arg : args)
+        context.console.print(arg + "\n");
     
-    XBuilderContext& context;
-    Project& project;
+    context.console.print("\n");
+}
+    
 };
-
-class Window {
-public:
-    virtual void render() = 0;
-    
-    Window(WindowContext& context_) : context(context_) { }
-    
-protected:
-    WindowContext context;
-};
-

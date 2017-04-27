@@ -15,26 +15,14 @@
 
 #pragma once
 
-#include "gui/MouseState.hpp"
-#include "level/Level.hpp"
-#include "project/Project.hpp"
+#include <vector>
+#include <string>
 
-class XBuilderContext;
+struct ConsoleCommandContext;
 
-struct WindowContext {
-    WindowContext(XBuilderContext& context_);
+namespace ConsoleCommands {
     
-    XBuilderContext& context;
-    Project& project;
+void commandClear(ConsoleCommandContext& context, std::vector<std::string>& args);
+void commandEcho(ConsoleCommandContext& context, std::vector<std::string>& args);
+    
 };
-
-class Window {
-public:
-    virtual void render() = 0;
-    
-    Window(WindowContext& context_) : context(context_) { }
-    
-protected:
-    WindowContext context;
-};
-

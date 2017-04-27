@@ -20,9 +20,11 @@ add_executable(XBuilder
   src/gui/widgets.cpp
   src/gui/ViewRenderer.cpp
   
+  src/gui/windows/Window.cpp
   src/gui/windows/tool/tools/ToolManager.cpp
   src/gui/windows/tool/tools/face/FaceTool.cpp
   src/gui/windows/tool/tools/segment/SegmentTool.cpp
+  src/gui/windows/console/ConsoleWindow.cpp
   
   src/pack/DirectoryScanner.cpp
   src/pack/ResourcePack.cpp
@@ -31,6 +33,9 @@ add_executable(XBuilder
   src/imgui/imgui_impl_sdl_gl3.cpp
   src/imgui/imgui.cpp
   src/imgui/imgui_draw.cpp
+  
+  src/console/Console.cpp
+  src/console/commands.cpp
 )
 
 find_package(Boost REQUIRED COMPONENTS filesystem)
