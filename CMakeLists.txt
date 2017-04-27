@@ -7,6 +7,7 @@ set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -g -fsanitize=address -fsanitize=undefined
 
 add_executable(XBuilder
   src/main.cpp
+  src/XBuilderContext.cpp
   
   src/level/Level.cpp
   src/level/Raytracer.cpp
@@ -16,7 +17,6 @@ add_executable(XBuilder
   src/keys.cpp
   src/texture.cpp
   
-  src/gui/gui.cpp
   src/gui/widgets.cpp
   src/gui/ViewRenderer.cpp
   

@@ -17,8 +17,8 @@
 #include <SDL2/SDL.h>
 #include <vector>
 
-#include "level/Level.hpp"
-#include "gui/gui.hpp"
+#include "gui/MainWindowManager.hpp"
+#include "XBuilderContext.hpp"
 
 using namespace std;
 
@@ -84,7 +84,15 @@ int main() {
     cam->base.base.pos.x = 0;
     cam->base.base.pos.y = -50 * 256;
     
-    initGUI();
+    MainWindowManager mainWindowManager;
+    mainWindowManager.openMainWindow();
+    
+    XBuilderContext context(mainWindowManager);
+    context.enterMainLoop();
+    
+    mainWindowManager.closeMainWindow();
+    
+    
     x3d_cleanup();
 }
 

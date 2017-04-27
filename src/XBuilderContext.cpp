@@ -13,12 +13,9 @@
 // You should have received a copy of the GNU General Public License
 // along with XBuilder. If not, see <http://www.gnu.org/licenses/>.
 
-#include <X3D/X3D.h>
+#include "XBuilderContext.hpp"
 
-#include <string>
-#include <vector>
-
-struct Context {
-    
-};
+void XBuilderContextEvent::setContextCurrentProject(XBuilderContext& context, Project* newProject) {
+    context.performSetCurrentProject(newProject);
+}
 
