@@ -68,7 +68,7 @@ private:
         
         if(state.leftPressed) {
             Prism3D geo = getNewGeometry();
-            context.level.addSegment(geo);
+            context.project.getLevel().addSegment(geo);
         }
     }
     

@@ -22,7 +22,7 @@ class TextureFaceTool : public FaceTool {
 public:
     TextureFaceTool(ToolContext& context_)
     : FaceTool(context_),
-    texturePickerWidget(TextureManager::getTextures()),
+    texturePickerWidget(context_.project.getTextureManager().getTextures()),
     offsetX(0),
     offsetY(0),
     lastOffsetX(0),
@@ -46,7 +46,7 @@ public:
             offsetY = primaryTexture.offset.y;
             scaleWidget.setValue(primaryTexture.scale / 256.0 * 100);
             
-            texturePickerWidget.setSelectedTexture(TextureManager::getTextureByTextureAddress(primaryTexture.tex));
+            texturePickerWidget.setSelectedTexture(context.project.getTextureManager().getTextureByTextureAddress(primaryTexture.tex));
             
             updatePrimaryTexture();
         }

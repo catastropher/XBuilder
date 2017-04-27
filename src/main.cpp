@@ -64,19 +64,9 @@ extern "C" void test_render_callback(X3D_CameraObject* cam) {
 #include "pack/ResourcePack.hpp"
 #include "level/LevelCommand.hpp"
 
-void testPack() {
-    X3D_ResourcePack pack;
-    x3d_resourcepack_load_from_file(&pack, "quake1.pak");
-    x3d_resourcepack_print_file_header(&pack);
-    x3d_resourcepack_cleanup(&pack);
-}
-
 void initGUI();
 
-int main() {
-    //testPack();
-    //return 0;
-    
+int main() {    
     init();
     
     //setup_key_map();
@@ -94,16 +84,7 @@ int main() {
     cam->base.base.pos.x = 0;
     cam->base.base.pos.y = -50 * 256;
     
-    //ToolManager toolState(cam, global_level);
-    //globalToolState = &toolState;
-    
     initGUI();
-    
-    //command_add_segment();
-    //x3d_game_loop();
-    
-    
-    //xbuilder_linetexture_editor();
     x3d_cleanup();
 }
 

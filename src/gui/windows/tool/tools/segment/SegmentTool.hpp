@@ -35,7 +35,7 @@ public:
         X3D_CameraObject* viewCamera = x3d_playermanager_get()->player[0].cam;
         
         if(state.leftPressed) {
-            Raytracer raytracer(context.level, viewCamera, state.pos);
+            Raytracer raytracer(context.project.getLevel(), viewCamera, state.pos);
             
             if(raytracer.findClosestIntersectedFace(selectedFace))
                 updateSelectedSeg();

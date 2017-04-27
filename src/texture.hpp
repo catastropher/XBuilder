@@ -19,11 +19,13 @@
 #include <vector>
 #include <string>
 #include <GLES3/gl3.h>
+#include <map>
 
 class OpenGLTextureManager {    
 public:
     static GLuint addX3DTexture(X3D_Texture* tex);
     static void updateX3DTexture(GLuint id, X3D_Texture* updatedTexture);
+    void purgeAllTextures();
     
     ~OpenGLTextureManager();
     
@@ -76,14 +78,14 @@ private:
 
 class TextureManager {
 public:
-    static LevelTexture* loadTextureFromFile(std::string fileName);
-    static LevelTexture* addTexture(X3D_Texture tex, std::string fileName);
+    LevelTexture* loadTextureFromFile(std::string fileName);
+    LevelTexture* addTexture(X3D_Texture tex, std::string fileName);
     
-    static const std::vector<LevelTexture*>& getTextures() {
+    const std::vector<LevelTexture*>& getTextures() {
         return textures;
     }
     
-    static LevelTexture* getTextureByName(std::string name) {
+    LevelTexture* getTextureByName(std::string name) {
         for(int i = 0; i < (int)textures.size(); ++i) {
             if(textures[i]->getName() == name)
                 return textures[i];
@@ -92,22 +94,27 @@ public:
         return nullptr;
     }
     
-    static LevelTexture* getTextureByTextureAddress(X3D_Texture* tex) {
-        for(int i = 0; i < (int)textures.size(); ++i) {
-            if(&textures[i]->getX3DTexture() == tex)
-                return textures[i];
-        }
+    LevelTexture* getTextureByTextureAddress(X3D_Texture* tex) {
+        if(levelTexturesByX3dAddress.count(tex->texels) == 0)
+            return nullptr;
         
-        return nullptr;
+        return levelTexturesByX3dAddress[tex->texels];
+    }
+    
+    void purgeAllTextures() {
+        for(int i = 0; i < (int)textures.size(); ++i)
+            delete textures[i];
+        
+        textures.clear();        
+    }
+    
+    ~TextureManager() {
+        purgeAllTextures();
     }
     
 private:
-    static std::vector<LevelTexture*> textures;
-    
-    ~TextureManager() {
-        for(int i = 0; i < (int)textures.size(); ++i)
-            delete textures[i];
-    }
+    std::vector<LevelTexture*> textures;
+    std::map<X3D_ColorIndex*, LevelTexture*> levelTexturesByX3dAddress;
 };
 
 

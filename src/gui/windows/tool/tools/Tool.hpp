@@ -27,6 +27,8 @@
 
 #include "geo/Distance.hpp"
 
+#include "project/Project.hpp"
+
 struct ToolContextColorPalette {
     X3D_ColorIndex geometryPreviewColor;
     X3D_ColorIndex primarySelectColor;
@@ -43,11 +45,11 @@ private:
 };
 
 struct ToolContext {
-    Level& level;
+    Project& project;
     ToolContextColorPalette colorPalette;
     Distance::Unit defaultDistanceUnit;
     
-    ToolContext(WindowContext& context) : level(context.level), defaultDistanceUnit(Distance::Unit::FEET) { }
+    ToolContext(WindowContext& context) : project(context.project), defaultDistanceUnit(Distance::Unit::FEET) { }
 };
 
 class Tool {

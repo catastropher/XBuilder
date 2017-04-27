@@ -22,7 +22,7 @@ class DecalTextureFaceTool : public FaceTool {
 public:
     DecalTextureFaceTool(ToolContext& context_)
     : FaceTool(context_),
-    texturePickerWidget(TextureManager::getTextures()),
+    texturePickerWidget(context_.project.getTextureManager().getTextures()),
     offsetX(0),
     offsetY(0),
     lastOffsetX(0),

@@ -36,33 +36,11 @@ private:
     X3D_Surface surface;
     
     X3D_SurfaceTexture surfaceTextures[2];
-    X3D_Texture tex;
-    X3D_Texture aperture;
     
 public:
     ViewWindow(WindowContext& context_) : context(context_) {
         screenTexture = *x3d_screenmanager_get_screen(x3d_screenmanager_get());
         renderTextureId = OpenGLTextureManager::addX3DTexture(&screenTexture);
-    
-        tex = TextureManager::getTextureByName("kstone3")->getX3DTexture();
-        surfaceTextures[0].tex = &tex;
-        surfaceTextures[0].angle = 0;
-        surfaceTextures[0].flags = 0;
-        surfaceTextures[0].offset = x3d_vex2d_make(0, 0);
-        surfaceTextures[0].scale = 256;
-        
-        aperture = TextureManager::getTextureByName("aperture")->getX3DTexture();
-        surfaceTextures[1].tex = &aperture;
-        surfaceTextures[1].angle = 0;
-        surfaceTextures[1].flags = X3D_SURFACETEXTURE_IS_DECAL;
-        surfaceTextures[1].offset = x3d_vex2d_make(100, 100);
-        surfaceTextures[1].scale = 256;
-        
-        
-        surface.total_textures = 2;
-        surface.textures = surfaceTextures;
-        
-        //x3d_surface_init(&surface, NULL);
     }
     
     void beginRender() {
@@ -73,7 +51,7 @@ public:
     
     void renderSegmentsInLevel() {
         X3D_ColorIndex red = x3d_color_to_colorindex(x3d_rgb_to_color(255, 0, 0));
-        ViewRenderer::renderAllSegmentsInLevel(context.level, red);
+        ViewRenderer::renderAllSegmentsInLevel(context.project.getLevel(), red);
     }
     
     void renderSandbox() {

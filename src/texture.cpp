@@ -49,8 +49,14 @@ void OpenGLTextureManager::updateX3DTexture(GLuint id, X3D_Texture* updatedTextu
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, updatedTexture->w, updatedTexture->h, GL_RGBA, GL_UNSIGNED_BYTE, &texturePixels[0]);
 }
 
-OpenGLTextureManager::~OpenGLTextureManager() {
+void OpenGLTextureManager::purgeAllTextures() {
     glDeleteTextures(loadedTextures.size(), &loadedTextures[0]);
+    loadedTextures.clear();
+}
+
+
+OpenGLTextureManager::~OpenGLTextureManager() {
+    purgeAllTextures();
 }
 
 GLuint OpenGLTextureManager::uploadByteArrayTexture(vector<unsigned char>& texturePixels, int texWidth, int texHeight) {
@@ -74,13 +80,12 @@ GLuint OpenGLTextureManager::addX3DTexture(X3D_Texture* tex) {
     return uploadByteArrayTexture(texturePixels, tex->w, tex->h);
 }
 
-vector<LevelTexture*> TextureManager::textures;
-
 LevelTexture* TextureManager::addTexture(X3D_Texture tex, string fileName) {
     int newTexId = textures.size();
     LevelTexture* levelTex = new LevelTexture(newTexId, fileName, tex);
     
     textures.push_back(levelTex);
+    levelTexturesByX3dAddress[levelTex->getX3DTexture().texels] = levelTex;
     
     return levelTex;
 }

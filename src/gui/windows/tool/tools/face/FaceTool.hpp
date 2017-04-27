@@ -36,7 +36,7 @@ public:
         Raytracer::FaceIntersection intersection;
         
         
-        Raytracer raytracer(context.level, viewCamera, state.pos);
+        Raytracer raytracer(context.project.getLevel(), viewCamera, state.pos);
         raytracer.findClosestIntersectedFace(intersection);
         return intersection;
     }

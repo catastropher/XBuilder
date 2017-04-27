@@ -25,6 +25,7 @@
 
 #include "gui/gui.hpp"
 #include "level/Raytracer.hpp"
+#include "project/Project.hpp"
 
 SDL_Window* window;
 SDL_GLContext glcontext;
@@ -32,8 +33,6 @@ SDL_GLContext glcontext;
 using namespace std;
 
 extern "C" void test_render_callback(X3D_CameraObject* cam);
-
-extern Level globalLevel;
 
 ToolManager* globalToolManager;
 
@@ -63,6 +62,9 @@ void setupWindow() {
 void initGUI() {
     setupWindow();
     
+    Project project;
+    
+    
     bool done = X3D_FALSE;
     ImVec4 clear_color = ImColor(114, 144, 154);
 
@@ -74,15 +76,13 @@ void initGUI() {
     vector<string> files = scanner.recursivelyScanFiles();
     
     for(string file : files) {
-        TextureManager::loadTextureFromFile(file);
+        project.getTextureManager().loadTextureFromFile(file);
     }
     
     //TextureManager::loadTextureFromFile("tex/quaketex/kstone3.bmp");
     //TextureManager::loadTextureFromFile("tex/quaketex/aperture.bmp");
     
-    TexturePickerWidget picker(TextureManager::getTextures());
-    
-    GuiManager guiManager(globalLevel);
+    GuiManager guiManager(project);
 
     while(!done) {
         SDL_Event event;
@@ -99,8 +99,6 @@ void initGUI() {
 //         ImGui::SetNextWindowSize(ImVec2(200,100), ImGuiSetCond_FirstUseEver);
 //         bool show_another_window;
 //         ImGui::Begin("Another Window", &show_another_window);
-        
-        picker.render();
         
         guiManager.render();
         

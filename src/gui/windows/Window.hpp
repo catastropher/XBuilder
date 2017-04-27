@@ -17,11 +17,12 @@
 
 #include "gui/MouseState.hpp"
 #include "level/Level.hpp"
+#include "project/Project.hpp"
 
 struct WindowContext {
-    Level& level;
+    Project& project;
     
-    WindowContext(Level& level_) : level(level_) { }
+    WindowContext(Project& project_) : project(project_) { }
 };
 
 class Window {

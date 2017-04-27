@@ -16,27 +16,18 @@
 #pragma once
 
 #include "level/Level.hpp"
-#include "windows/windows.hpp"
+#include "texture.hpp"
 
-struct GuiManager {
+class Project {
 public:
-    GuiManager(Project& project) : context(project), toolWindow(context), viewWindow(context) { }
+    Project() { }
     
-    void render() {
-        viewWindow.beginRender();
-        viewWindow.renderSegmentsInLevel();
-        
-        MouseState mouseState = viewWindow.getMouseStateRelativeToWindow();
-        
-        toolWindow.handleMouse(mouseState);
-        toolWindow.render();
-        
-        viewWindow.renderWindow();
-    }
+    Level& getLevel() { return currentLevel; }
+    TextureManager& getTextureManager() { return textureManager; }
     
 private:
-    WindowContext context;
-    ToolWindow toolWindow;
-    ViewWindow viewWindow;
+    Level currentLevel;
+    TextureManager textureManager;
 };
+
 
