@@ -15,6 +15,8 @@
 
 #pragma once
 
+#include <string>
+
 #include "gui/MouseState.hpp"
 #include "level/Level.hpp"
 #include "project/Project.hpp"
@@ -28,13 +30,20 @@ struct WindowContext {
     Project& project;
 };
 
+class GuiManager;
+
 class Window {
 public:
-    virtual void render() = 0;
+    Window(WindowContext& context_, std::string title_, bool isOpenByDefault = false)
+        : context(context_), title(title_), isOpen(isOpenByDefault) { }
     
-    Window(WindowContext& context_) : context(context_) { }
+    virtual void render() = 0;
     
 protected:
     WindowContext context;
+    std::string title;
+    bool isOpen;
+    
+    friend class GuiManager;
 };
 

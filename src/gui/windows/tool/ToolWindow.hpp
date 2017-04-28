@@ -16,9 +16,9 @@
 #include "../Window.hpp"
 #include "tools/tools.hpp"
 
-class ToolWindow : Window {
+class ToolWindow : public Window {
 public:
-    ToolWindow(WindowContext& context_) : Window(context_), toolManager(context_) { }
+    ToolWindow(WindowContext& context_) : Window(context_, "Tools", true), toolManager(context_) { }
     
     void render() {
         toolManager.renderToolWindow();

@@ -30,19 +30,43 @@ public:
         }
     
     void render() {
+        renderMenuBar();
+        
         viewWindow.beginRender();
         viewWindow.renderSegmentsInLevel();
         
         MouseState mouseState = viewWindow.getMouseStateRelativeToWindow();
         
         toolWindow.handleMouse(mouseState);
-        toolWindow.render();
-        
-        viewWindow.renderWindow();
-        consoleWindow.render();
+        renderWindow(toolWindow);        
+        renderWindow(viewWindow);
+        renderWindow(consoleWindow);
     }
     
 private:
+    void renderMenuBar() {
+        if (ImGui::BeginMainMenuBar()) {
+            if(ImGui::BeginMenu("View")) {
+                ImGui::MenuItem("X3D", nullptr, &viewWindow.isOpen);
+                ImGui::MenuItem("Tools", nullptr, &toolWindow.isOpen);
+                ImGui::MenuItem("Console", nullptr, &consoleWindow.isOpen);
+                
+                ImGui::EndMenu();
+            }
+            
+            ImGui::EndMainMenuBar();
+        }
+    }
+    
+    void renderWindow(Window& window) {
+        if(!window.isOpen)
+            return;
+            
+        ImGui::Begin(window.title.c_str(), &window.isOpen);
+        window.render();
+        ImGui::End();
+    }
+    
     WindowContext context;
     ToolWindow toolWindow;
     ViewWindow viewWindow;

@@ -16,12 +16,11 @@
 #include "ConsoleWindow.hpp"
 #include "XBuilderContext.hpp"
 
-ConsoleWindow::ConsoleWindow(WindowContext& context_) : Window(context_), inputBuf("") {
+ConsoleWindow::ConsoleWindow(WindowContext& context_) : Window(context_, "Console", true), inputBuf("") {
     context.context.getConsole().printLine("Welcome to XBuilder!");
 }
 
 void ConsoleWindow::render() {
-    ImGui::Begin("Console");
     ImGui::BeginChild("ScrollingRegion", ImVec2(0,-ImGui::GetItemsLineHeightWithSpacing()), false, ImGuiWindowFlags_HorizontalScrollbar);
     
     Console& console = context.context.getConsole();
@@ -44,7 +43,5 @@ void ConsoleWindow::render() {
     
     if(ImGui::IsItemHovered() || (ImGui::IsRootWindowOrAnyChildFocused() && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0)))
         ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
-    
-    ImGui::End();
 }
 

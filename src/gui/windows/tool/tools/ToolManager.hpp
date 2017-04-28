@@ -31,7 +31,6 @@ struct ToolManager {
     void setSelectedToolGroup(std::string name);
     
     void renderToolWindow() {
-        ImGui::Begin("Tools");
         toolGroupDropdown.renderDropDown();
         
         if(toolGroupDropdown.valueChanged()) {
@@ -42,8 +41,6 @@ struct ToolManager {
             selectedToolGroup->renderToolDropDown();
             selectedToolGroup->renderToolWindow();
         }
-        
-        ImGui::End();
     }
     
     void viewWindowHandleMouse(MouseState& state) {

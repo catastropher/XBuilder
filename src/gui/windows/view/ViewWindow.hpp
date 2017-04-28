@@ -27,18 +27,9 @@
 
 extern "C" void test_render_callback(X3D_CameraObject*);
 
-class ViewWindow {
-private:
-    GLuint renderTextureId;
-    WindowContext& context;
-    MouseState currentMouseState;
-    X3D_Texture screenTexture;
-    X3D_Surface surface;
-    
-    X3D_SurfaceTexture surfaceTextures[2];
-    
+class ViewWindow : public Window {
 public:
-    ViewWindow(WindowContext& context_) : context(context_) {
+    ViewWindow(WindowContext& context_) : Window(context_, "X3D", true) {
         screenTexture = *x3d_screenmanager_get_screen(x3d_screenmanager_get());
         renderTextureId = OpenGLTextureManager::addX3DTexture(&screenTexture);
     }
@@ -54,37 +45,20 @@ public:
         ViewRenderer::renderAllSegmentsInLevel(context.project.getLevel(), red);
     }
     
-    void renderSandbox() {
-        //x3d_surface_force_entire_rebuild(&surface);
-        //x3d_texture_blit(x3d_surface_texture(&surface), 0, 0);
-    }
-    
-    void renderWindow() {
+    void render() {
         x3d_read_keys();
-        
         x3d_keymanager_get()->key_handler();
         
-        renderSandbox();
-        
         updateRenderOutputTexture();
-        
-        ImGui::SetNextWindowSize(ImVec2(640, 480), ImGuiSetCond_Always);
-        bool show_another_window = true;
-        ImGui::Begin("X3D", &show_another_window, ImVec2(640, 480), -1.0f);
-        
-        ImGui::Image((void*)(size_t)renderTextureId, ImVec2(screenTexture.w, screenTexture.h));
-        
+        ImGui::Image((void*)(size_t)renderTextureId, ImVec2(screenTexture.w, screenTexture.h));        
         updateMouseState();
-        
-        ImGui::End();
     }
     
     MouseState getMouseStateRelativeToWindow() {
         return currentMouseState;
     }
     
-private:
-    
+private:    
     void renderAxes() {
         float size = Distance(10, Distance::FEET).toUnit(Distance::X3D_UNITS).dist;
         
@@ -115,6 +89,14 @@ private:
         
         currentMouseState = MouseState(ImGui::IsItemClicked(0), ImGui::IsItemClicked(1), pos, ImGui::IsItemHovered(), { (int)windowPos.x, (int)windowPos.y});
     }
+    
+    GLuint renderTextureId;
+    MouseState currentMouseState;
+    X3D_Texture screenTexture;
+    X3D_Surface surface;
+    
+    X3D_SurfaceTexture surfaceTextures[2];
+    
 };
 
     
