@@ -83,3 +83,32 @@ ResourcePackBuilder::~ResourcePackBuilder() {
     for(ResourcePackDataSoure * source : sources)
         delete source;
 }
+
+
+void ResourcePackExtractor::extractPackFilesToDirectory(string directoryName) {
+    if(!x3d_resourcepack_load_from_file(&pack, packFileName.c_str()))
+        throw "Failed to open resource pack " + packFileName;
+    
+    for(int i = 0; i < (int)pack.total_files; ++i)
+        extractPackFile(pack.pack_files[i].name, directoryName);
+    
+    x3d_resourcepack_cleanup(&pack);
+}
+
+void ResourcePackExtractor::extractPackFile(const char* packFileName, string destDirectory) {
+    X3D_Buffer packFileBuffer;
+    if(!x3d_resourcepack_open_packfile(&pack, packFileName, &packFileBuffer))
+        throw "Failed to open packfile " + string(packFileName);
+    
+    string packFileDest = destDirectory + packFileName;
+    path outputDirectory = path(packFileDest).parent_path();
+    
+    if(!exists(outputDirectory))
+        create_directories(outputDirectory);
+    
+    if(!x3d_buffer_save_to_file(&packFileBuffer, packFileDest.c_str()))
+        throw "Failed to save extracted packfile " + packFileDest;
+    
+    x3d_resourcepack_close_packfile(&pack, &packFileBuffer);
+}
+

@@ -57,3 +57,17 @@ private:
     std::vector<ResourcePackDataSoure*> sources;
 };
 
+
+class ResourcePackExtractor {
+public:
+    ResourcePackExtractor(std::string packFileName_) : packFileName(packFileName_) { }
+    
+    void extractPackFilesToDirectory(std::string directoryName);
+    
+private:
+    void extractPackFile(const char* packFileName, std::string destDirectory);
+    
+    X3D_ResourcePack pack;
+    std::string packFileName;
+};
+

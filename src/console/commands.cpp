@@ -21,6 +21,7 @@
 #include "pack/DirectoryScanner.hpp"
 #include "XBuilderContext.hpp"
 #include "project/ProjectSaver.hpp"
+#include "pack/ResourcePack.hpp"
 
 using namespace std;
 
@@ -66,6 +67,21 @@ void commandSave(ConsoleCommandContext& context, std::vector<std::string>& args)
     saver.saveToFile(args[0]);
     
     context.console.printLine("Saved to " + args[0]);
+}
+
+void commandExtractPack(ConsoleCommandContext& context, std::vector<std::string>& args) {
+    if(args.size() != 2)
+        throw "Wrong numbers of args";
+    
+    try {
+        ResourcePackExtractor packExtractor(args[0]);
+        packExtractor.extractPackFilesToDirectory(args[1]);
+        
+        context.console.printLine("Extracted pack file to " + args[1]);
+    }
+    catch(boost::filesystem::filesystem_error err) {
+        throw "Could not extrack packfile " + args[0] + ": " + err.what();
+    }
 }
     
 };

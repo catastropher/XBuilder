@@ -43,6 +43,12 @@ Console::Console(XBuilderContext& context_) : context(context_), hasNewText(fals
         "Saves the project to a file",
         commandSave
     );
+    
+    addCommand(
+        "extract-pack",
+        "Extracts a packfile",
+        commandExtractPack
+    );
 }
 
 void Console::executeCommand(string command) {
