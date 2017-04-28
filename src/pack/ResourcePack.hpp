@@ -31,15 +31,16 @@ struct ResourcePackPhysicalFile : ResourcePackDataSoure {
     std::string rootDirectory;
     std::string physicalRelativePath;
     
-    ResourcePackPhysicalFile(std::string rootDirectory_, std::string physicalRelativePath_, std::string packFilePath_) :
-        ResourcePackDataSoure(packFilePath_), rootDirectory(rootDirectory_), physicalRelativePath(physicalRelativePath_) { }
+    ResourcePackPhysicalFile(std::string rootDirectory_, std::string physicalRelativePath_, std::string packFilePath_)
+        : ResourcePackDataSoure(packFilePath_),
+        rootDirectory(rootDirectory_),
+        physicalRelativePath(physicalRelativePath_)
+        { }
     
     std::vector<uint8> getSourceContents();
 };
 
 class ResourcePackBuilder {
-    std::vector<ResourcePackDataSoure*> sources;
-    
 public:
     void addFilesFromDirectoryToPackDirectory(std::string directory, std::string packDirectory);
     void writePackFile(std::string packFileName);
@@ -52,5 +53,7 @@ private:
     }
     
     X3D_ResourcePackFile buildPackFileFromDataSource(ResourcePackDataSoure* source);
+    
+    std::vector<ResourcePackDataSoure*> sources;
 };
 

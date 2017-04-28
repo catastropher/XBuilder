@@ -19,6 +19,7 @@
 #include <boost/filesystem.hpp>
 
 #include "texture.hpp"
+#include "pack/fileutils.hpp"
 #include "imgui/imgui.h"
 
 using namespace std;
@@ -80,6 +81,20 @@ GLuint OpenGLTextureManager::addX3DTexture(X3D_Texture* tex) {
     return uploadByteArrayTexture(texturePixels, tex->w, tex->h);
 }
 
+void LevelTexture::saveToFile(string fileName) {
+    // This should probably be a function in X3D
+    FILE* file = fopen(fileName.c_str(), "wb");
+    if(!file)
+        throw "Failed to save texture " + fileName;
+    
+    writeIntToFile(file, getWidth());
+    writeIntToFile(file, getHeight());
+    fwrite(getX3DTexture().texels, sizeof(X3D_ColorIndex), totalTexels(), file);
+    
+    fclose(file);
+}
+
+
 LevelTexture* TextureManager::addTexture(X3D_Texture tex, string fileName) {
     int newTexId = textures.size();
     LevelTexture* levelTex = new LevelTexture(newTexId, fileName, tex);
@@ -99,7 +114,7 @@ LevelTexture* TextureManager::loadTextureFromFile(string fileName) {
     
     string name = path(fileName).filename().string();
     
-    int lastDotIndex = name.find_last_of("."); 
+    auto lastDotIndex = name.find_last_of("."); 
     
     if(lastDotIndex != string::npos) {
         name = name.substr(0, lastDotIndex); 

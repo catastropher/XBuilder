@@ -49,6 +49,10 @@ public:
         return texture.h;
     }
     
+    int totalTexels() const {
+        return texture.w * texture.h;
+    }
+    
     std::string getName() const {
         return name;
     }
@@ -60,16 +64,14 @@ public:
     void* getImguiId() const {
         return (void *)(size_t)glTextureId;
     }
-   
-    void renderInGUI();
+    
+    void saveToFile(std::string fileName);
     
     ~LevelTexture() {
         x3d_texture_cleanup(&texture);
     }
     
 private:
-    void createOpenGLTexture();
-    
     int id;
     std::string name;
     X3D_Texture texture;
@@ -106,6 +108,11 @@ public:
             delete textures[i];
         
         textures.clear();        
+    }
+    
+    void saveAllTexturesToDirectory(std::string directory) {
+        for(LevelTexture* tex : textures)
+            tex->saveToFile(directory + "/" + tex->getName() + ".xtex");
     }
     
     ~TextureManager() {

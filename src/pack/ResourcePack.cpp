@@ -41,6 +41,9 @@ void ResourcePackBuilder::addFilesFromDirectoryToPackDirectory(string directory,
     DirectoryScanner scanner(directory, true);
     vector<string> fileNames = scanner.recursivelyScanFiles();
     
+    if(directory[directory.length() - 1] != '/')
+        directory += '/';
+    
     for(string& fileName : fileNames) {
         addSource(new ResourcePackPhysicalFile(directory, fileName, packDirectory + "/" + fileName));
     }

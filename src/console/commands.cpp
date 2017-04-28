@@ -20,13 +20,13 @@
 #include "Console.hpp"
 #include "pack/DirectoryScanner.hpp"
 #include "XBuilderContext.hpp"
+#include "project/ProjectSaver.hpp"
 
 using namespace std;
 
 namespace ConsoleCommands {
 
 void commandClear(ConsoleCommandContext& context, std::vector<std::string>& args) {
-    printf("Console cleared\n");
     context.console.clear();
 }
 
@@ -56,6 +56,16 @@ void commandImportTex(ConsoleCommandContext& context, std::vector<std::string>& 
     catch(boost::filesystem::filesystem_error err) {
         throw "Could not open directory " + args[0];
     }
+}
+
+void commandSave(ConsoleCommandContext& context, std::vector<std::string>& args) {
+    if(args.size() == 0)
+        throw "Expected file name to save project to";
+    
+    ProjectSaver saver(context.context.getProject());
+    saver.saveToFile(args[0]);
+    
+    context.console.printLine("Saved to " + args[0]);
 }
     
 };

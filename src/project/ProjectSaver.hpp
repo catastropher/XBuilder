@@ -15,16 +15,17 @@
 
 #pragma once
 
-#include <vector>
 #include <string>
 
-struct ConsoleCommandContext;
+#include "Project.hpp"
 
-namespace ConsoleCommands {
+class ProjectSaver {
+public:
+    ProjectSaver(Project& projectToSave) : project(projectToSave) { }
     
-void commandClear(ConsoleCommandContext& context, std::vector<std::string>& args);
-void commandEcho(ConsoleCommandContext& context, std::vector<std::string>& args);
-void commandImportTex(ConsoleCommandContext& context, std::vector<std::string>& args);
-void commandSave(ConsoleCommandContext& context, std::vector<std::string>& args);
-
+    void saveToFile(std::string fileName);
+    
+private:
+    Project& project;
 };
+

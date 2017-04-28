@@ -37,6 +37,12 @@ Console::Console(XBuilderContext& context_) : context(context_), hasNewText(fals
         "Imports bitmaps as textures from a directory",
         commandImportTex
     );
+    
+    addCommand(
+        "save",
+        "Saves the project to a file",
+        commandSave
+    );
 }
 
 void Console::executeCommand(string command) {

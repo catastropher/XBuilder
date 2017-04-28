@@ -15,16 +15,21 @@
 
 #pragma once
 
-#include <vector>
-#include <string>
+#include <cstdio>
 
-struct ConsoleCommandContext;
+static inline void writeIntToFile(FILE* file, int val) {
+    for(int i = 0; i < 4; ++i) {
+        fputc(val & 0xFF, file);
+        val >>= 8;
+    }
+}
 
-namespace ConsoleCommands {
+static inline int readIntFromFile(FILE* file) {
+    int val = 0;
     
-void commandClear(ConsoleCommandContext& context, std::vector<std::string>& args);
-void commandEcho(ConsoleCommandContext& context, std::vector<std::string>& args);
-void commandImportTex(ConsoleCommandContext& context, std::vector<std::string>& args);
-void commandSave(ConsoleCommandContext& context, std::vector<std::string>& args);
+    for(int i = 0; i < 4; ++i)
+        val = (val << 8) | fgetc(file) << 24;
+    
+    return val;
+}
 
-};
