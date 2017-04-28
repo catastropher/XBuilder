@@ -16,6 +16,8 @@
 #pragma once
 
 #include <cstdio>
+#include <cstdlib>
+#include <string>
 
 static inline void writeIntToFile(FILE* file, int val) {
     for(int i = 0; i < 4; ++i) {
@@ -31,5 +33,15 @@ static inline int readIntFromFile(FILE* file) {
         val = (val << 8) | fgetc(file) << 24;
     
     return val;
+}
+
+static inline void saveStringAsFile(std::string& str, std::string fileName) {
+    FILE* file = fopen(fileName.c_str(), "wb");
+    
+    if(!file)
+        throw "Failed to open " + fileName + " for writing";
+    
+    fwrite(str.c_str(), 1, str.length(), file);
+    fclose(file);
 }
 

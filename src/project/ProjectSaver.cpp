@@ -33,6 +33,7 @@ void ProjectSaver::saveToFile(string fileName) {
         create_directory(texturesDir);
         
         project.getTextureManager().saveAllTexturesToDirectory(texturesDir.string());
+        project.getLevel().saveLevelToJsonFile(projectDir.string() + "/level1.json");
         
         ResourcePackBuilder packBuilder;
         packBuilder.addFilesFromDirectoryToPackDirectory(projectDir.string(), "");

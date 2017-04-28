@@ -22,12 +22,18 @@
 #include "geo/geo.hpp"
 #include "texture.hpp"
 #include "gui/ViewRenderer.hpp"
+#include "json/json.hpp"
+#include "pack/fileutils.hpp"
 
 class Level;
-    
+
+using nlohmann::json;
+
 struct Vertex {
     Vec3 v;
+    int id;
     
+    Vertex(Vec3 v_, int id_) : v(v_), id(id_) { }
     Vertex(Vec3 v_) : v(v_) { }
     
     bool operator<(const Vertex& vertex) const {
@@ -68,8 +74,10 @@ public:
         if(vertices.count(vertex) != 0)
             return vertices[vertex];
         
-        Vertex* newVertex = new Vertex(v);
+        int newVertexId = vertices.size();
+        Vertex* newVertex = new Vertex(v, newVertexId);
         vertices[vertex] = newVertex;
+        verticesById.push_back(newVertex);
         
         return newVertex;
     }
@@ -83,6 +91,22 @@ public:
         return LevelPrism(v);
     }
     
+    void addVerticesToLevelJson(json& levelJson) {
+        json verticesJson = json::array();
+        
+        for(Vertex* v : verticesById) {
+            verticesJson.push_back(
+                {
+                    { "x", v->v.x },
+                    { "y", v->v.y },
+                    { "z", v->v.z }
+                }
+            );
+        }
+        
+        levelJson["vertices"] = verticesJson;
+    }
+    
     ~VertexManager() {
         for(auto v : vertices) {
             delete v.second;
@@ -93,6 +117,7 @@ public:
     
 private:
     std::map<Vertex, Vertex*> vertices;
+    std::vector<Vertex*> verticesById;
 };
 
 struct Segment;
@@ -335,6 +360,15 @@ public:
         for(SegmentIterator i = segmentBegin(); i != segmentEnd(); ++i) {
             i->rebuildSurfaces();
         }
+    }
+    
+    void saveLevelToJsonFile(std::string fileName) {
+        json levelJson = json::object();
+        
+        vertexManager.addVerticesToLevelJson(levelJson);
+        
+        std::string levelJsonString = levelJson.dump(4);
+        saveStringAsFile(levelJsonString, fileName);
     }
     
     ~Level() {
