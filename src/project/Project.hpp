@@ -20,7 +20,7 @@
 
 class Project {
 public:
-    Project() { }
+    Project() : currentLevel(textureManager) { }
     
     Level& getLevel() { return currentLevel; }
     TextureManager& getTextureManager() { return textureManager; }

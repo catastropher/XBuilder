@@ -36,7 +36,7 @@ void ConsoleWindow::render() {
     ImGui::Separator();
     
     if(ImGui::InputText("Input", inputBuf, sizeof(inputBuf), ImGuiInputTextFlags_EnterReturnsTrue)) {
-        console.printLine(inputBuf);
+        console.printLine("$ " + std::string(inputBuf));
         console.executeCommand(inputBuf);
         inputBuf[0] = '\0';
     }

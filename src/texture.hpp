@@ -65,7 +65,7 @@ public:
         return (void *)(size_t)glTextureId;
     }
     
-    void saveToFile(std::string fileName);
+    void saveToXtexFile(std::string fileName);
     
     ~LevelTexture() {
         x3d_texture_cleanup(&texture);
@@ -81,6 +81,7 @@ private:
 class TextureManager {
 public:
     LevelTexture* loadTextureFromFile(std::string fileName);
+    
     LevelTexture* addTexture(X3D_Texture tex, std::string fileName);
     
     const std::vector<LevelTexture*>& getTextures() {
@@ -110,10 +111,12 @@ public:
         textures.clear();        
     }
     
-    void saveAllTexturesToDirectory(std::string directory) {
+    void exportAllTexturesToDirectory(std::string directory) {
         for(LevelTexture* tex : textures)
-            tex->saveToFile(directory + "/" + tex->getName() + ".xtex");
+            tex->saveToXtexFile(directory + "/" + tex->getName() + ".xtex");
     }
+    
+    void recursivelyImportTexturesFromDirectory(std::string directory);
     
     ~TextureManager() {
         purgeAllTextures();

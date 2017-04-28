@@ -19,7 +19,7 @@
 using namespace ConsoleCommands;
 using namespace std;
 
-Console::Console(XBuilderContext& context_) : context(context_), hasNewText(false) {
+Console::Console(XBuilderContext& context_) : context(context_), hasNewText(false), enableLogging(true) {
     addCommand(
         "clear",
         "Clears the console",
@@ -42,6 +42,12 @@ Console::Console(XBuilderContext& context_) : context(context_), hasNewText(fals
         "save",
         "Saves the project to a file",
         commandSave
+    );
+    
+    addCommand(
+        "load",
+        "Loads a project from a file",
+        commandLoad
     );
     
     addCommand(

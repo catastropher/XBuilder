@@ -27,10 +27,10 @@ static inline void writeIntToFile(FILE* file, int val) {
 }
 
 static inline int readIntFromFile(FILE* file) {
-    int val = 0;
+    unsigned int val = 0;
     
     for(int i = 0; i < 4; ++i)
-        val = (val << 8) | fgetc(file) << 24;
+        val = (val >> 8) | (fgetc(file) << 24);
     
     return val;
 }
@@ -43,5 +43,23 @@ static inline void saveStringAsFile(std::string& str, std::string fileName) {
     
     fwrite(str.c_str(), 1, str.length(), file);
     fclose(file);
+}
+
+static inline std::string loadFileIntoString(std::string fileName) {
+    FILE* file = fopen(fileName.c_str(), "rb");
+    
+    if(!file)
+        throw "Failed to open " + fileName + " for reading";
+    
+    // This could easily be optimized...
+    std::string str;
+    int c;
+    while((c = fgetc(file)) != EOF) {
+        str += (char)c;
+    }
+    
+    fclose(file);
+    
+    return str;
 }
 

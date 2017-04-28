@@ -38,6 +38,7 @@ add_executable(XBuilder
   src/console/commands.cpp
   
   src/project/ProjectSaver.cpp
+  src/project/ProjectLoader.cpp
 )
 
 find_package(Boost REQUIRED COMPONENTS filesystem)

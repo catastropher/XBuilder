@@ -14,36 +14,42 @@
 // along with XBuilder. If not, see <http://www.gnu.org/licenses/>.
 
 #include <boost/filesystem.hpp>
-#include <iostream>
 
-#include "ProjectSaver.hpp"
+#include "ProjectLoader.hpp"
+#include "Project.hpp"
 #include "pack/ResourcePack.hpp"
 
 using namespace std;
 using namespace boost::filesystem;
 
-void ProjectSaver::saveToFile(string fileName) {
+Project* ProjectLoader::loadFromFile() {
+    Project* newProject = new Project;
+    path tempDir = unique_path();
+    
     try {
-        path tempDir = unique_path();
-        path projectDir = tempDir.string() + "/project";
+        create_directories(tempDir);
         
-        create_directories(projectDir);
+        ResourcePackExtractor extractor(fileName);
+        extractor.extractPackFilesToDirectory(tempDir.string());
         
-        path texturesDir = projectDir.string() + "/textures";
-        create_directory(texturesDir);
-        
-        project.getTextureManager().exportAllTexturesToDirectory(texturesDir.string());
-        project.getLevel().saveLevelToJsonFile(projectDir.string() + "/level1.json");
-        
-        ResourcePackBuilder packBuilder;
-        packBuilder.addFilesFromDirectoryToPackDirectory(projectDir.string(), "");
-        packBuilder.writePackFile(fileName + ".xproj");
+        newProject->getTextureManager().recursivelyImportTexturesFromDirectory(tempDir.string() + "/textures");        
+        newProject->getLevel().loadLevelFromFile(tempDir.string() + "/level1.json");
         
         remove_all(tempDir);
         
+        return newProject;
     }
     catch(filesystem_error err) {
-        throw "Failed to save project: " + (string)err.what();
+        if(exists(tempDir))
+            remove_all(tempDir);
+        
+        throw "Failed to load project: " + (string)err.what();
+    }
+    catch(...) {
+        if(exists(tempDir))
+            remove_all(tempDir);
+        
+        throw;
     }
 }
 

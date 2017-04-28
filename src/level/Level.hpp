@@ -18,6 +18,7 @@
 #include <vector>
 #include <X3D/X3D.h>
 #include <map>
+#include <cassert>
 
 #include "geo/geo.hpp"
 #include "texture.hpp"
@@ -37,7 +38,7 @@ struct Vertex {
     Vertex(Vec3 v_) : v(v_) { }
     
     bool operator<(const Vertex& vertex) const {
-        return v.toTuple() < vertex.v.toTuple();
+        return v.toIntTuple() < vertex.v.toIntTuple();
     }
 };
 
@@ -60,6 +61,16 @@ public:
     void updateGeometry(Prism3D& updatedGeometry) {
         for(int i = 0; i < (int)vertices.size(); ++i)
             vertices[i]->v = updatedGeometry.getVertex(i);
+    }
+    
+    json saveToJsonObject() {
+        json vertexIds = json::array();
+        
+        for(int i = 0; i < (int)vertices.size(); ++i) {
+            vertexIds.push_back(vertices[i]->id);
+        }
+        
+        return vertexIds;
     }
     
 private:
@@ -107,6 +118,27 @@ public:
         levelJson["vertices"] = verticesJson;
     }
     
+    void loadVerticesFromLevelJson(json& levelJson) {
+        assert(vertices.size() == 0);
+        
+        int vertexId = 0;
+        for(auto vertex : levelJson["vertices"]) {
+            Vec3 v = Vec3(vertex["x"], vertex["y"], vertex["z"]);
+            
+            if(vertices.count(Vertex(v)) != 0)
+                throw "Vertex #" + std::to_string(vertexId) + " is a duplicate of vertex #" + std::to_string(vertices[Vertex(v)]->id);
+            
+            addVertex(v);
+            ++vertexId;
+        }
+    }
+    
+    Vertex* getVertexById(int id) {
+        assert(id < (int)verticesById.size());
+        
+        return verticesById[id];
+    }
+    
     ~VertexManager() {
         for(auto v : vertices) {
             delete v.second;
@@ -125,13 +157,14 @@ struct Level;
 
 class LevelSurface {
 public:
-    LevelSurface(Polygon3D geometry) : hasPrimaryTexture_(false) {
-        X3D_Vex3D v[X3D_MAX_POINTS_IN_POLY];
-        X3D_Polygon3D poly;
-        poly.v = v;
+    LevelSurface(Polygon3D geometry, Level& level_) : level(level_), hasPrimaryTexture_(false) {
+        surface.surface.texels = nullptr;
         
-        geometry.toX3DPolygon3D(poly);
-        x3d_surface_init(&surface, &poly);
+        if(geometry.totalVertices() == 0) {
+            return;
+        }
+        
+        updateSurfaceGeometry(geometry);
     }
     
     void updateSurfaceGeometry(Polygon3D geometry) {
@@ -140,7 +173,11 @@ public:
         poly.v = v;
         
         geometry.toX3DPolygon3D(poly);
-        x3d_surface_update_geometry(&surface, &poly);
+        
+        if(surface.surface.texels)
+            x3d_surface_update_geometry(&surface, &poly);
+        else
+            x3d_surface_init(&surface, &poly);
         
         rebuildSurface();
     }
@@ -191,8 +228,43 @@ public:
         return v.x >= 0 && v.x < x3d_surface_w(&surface) && v.y >= 0 && v.y < x3d_surface_h(&surface);
     }
     
+    json saveToJsonObject() {
+        json surfaceJson = json::object();
+        
+        if(!hasPrimaryTexture()) {
+            surfaceJson["primaryTexture"] = nullptr;
+        }
+        else {
+            surfaceJson["primaryTexture"] = saveX3dSurfaceTextureToJson(&primaryTexture);
+        }
+        
+        json decalTextures = json::array();
+        
+        for(int i = 0; i < (int)decals.size(); ++i)
+            decalTextures.push_back(saveX3dSurfaceTextureToJson(decals[i]));
+        
+        surfaceJson["decalTextures"] = decalTextures;
+        
+        return surfaceJson;
+    }
+    
+    void loadFromJsonObject(json& surfaceJson) {
+        assert(!hasPrimaryTexture_ && totalDecals() == 0);
+        
+        hasPrimaryTexture_ = surfaceJson["primaryTexture"] != nullptr;
+        
+        if(hasPrimaryTexture()) {
+            primaryTexture = loadX3dSurfaceTextureFromJson(surfaceJson["primaryTexture"]);
+        }
+        
+        for(auto decalTexture : surfaceJson["decalTextures"]) {
+            addNewDecalTexture(loadX3dSurfaceTextureFromJson(decalTexture));
+        }
+    }
+    
     ~LevelSurface() {
-        x3d_surface_cleanup(&surface);
+        if(surface.surface.texels)
+            x3d_surface_cleanup(&surface);
     }
     
 private:
@@ -213,6 +285,10 @@ private:
         surface.textures = &surfaceTextures[0];
     }
     
+    json saveX3dSurfaceTextureToJson(X3D_SurfaceTexture* tex);
+    X3D_SurfaceTexture loadX3dSurfaceTextureFromJson(json& texJson);
+    
+    Level& level;
     X3D_Surface surface;
     X3D_SurfaceTexture primaryTexture;
     bool hasPrimaryTexture_;
@@ -222,7 +298,7 @@ private:
 
 class LevelSegmentFace {
 public:
-    LevelSegmentFace(Segment& seg_, int id_) : seg(seg_), id(id_), connectedFace(nullptr), surface(getGeometry()) { }
+    LevelSegmentFace(Segment& seg_, int id_);
     
     Polygon3D getGeometry() const;
     LevelSegmentFace& operator=(const LevelSegmentFace& face);
@@ -248,6 +324,9 @@ public:
         surface.updateSurfaceGeometry(getGeometry());
     }
     
+    json saveToJsonObject();
+    void loadFromJsonObject(json& faceJson);
+    
 private:
     Segment& seg;
     int id;
@@ -261,6 +340,9 @@ public:
     Segment(Level& level_, LevelPrism& geometry_, int id_)
         : level(level_), geometry(geometry_), id(id_), deleted(false)
         {
+            if(geometry.baseVertices() == 0)
+                return;
+            
             for(int i = 0; i < geometry_.totalFaces(); ++i)
                 faces.push_back(new LevelSegmentFace(*this, i));
         }
@@ -284,8 +366,30 @@ public:
     void rebuildSurfaces() {
         for(int i = 0; i < totalFaces(); ++i) {
             faces[i]->rebuildSurface();
-        }
+        }        
     }
+    
+    json saveToJsonObject() {
+        json segmentJson = json::object();
+        
+        segmentJson["id"] = id;
+        segmentJson["isDeleted"] = isDeleted();
+        segmentJson["prism"] = geometry.saveToJsonObject();
+        
+        json facesJson = json::array();
+        
+        for(int i = 0; i < totalFaces(); ++i) {
+            facesJson.push_back(faces[i]->saveToJsonObject());
+        }
+        
+        segmentJson["faces"] = facesJson;
+        
+        return segmentJson;
+    }
+    
+    void loadFromJsonObject(json& segmentJson);
+    
+    int getId() const { return id; }
     
     ~Segment() {
         for(int i = 0; i < (int)geometry.totalFaces(); ++i)
@@ -342,6 +446,8 @@ public:
         Segment** end;
     };
     
+    Level(TextureManager& textureManager_) : textureManager(textureManager_) { }
+    
     Segment& getSegment(int id) const { return *segments[id]; }
     SegmentIterator segmentBegin() {return SegmentIterator(&segments[0], &segments[segments.size()]); }
     SegmentIterator segmentEnd() { return SegmentIterator(&segments[segments.size()], &segments[segments.size()]); }
@@ -367,8 +473,41 @@ public:
         
         vertexManager.addVerticesToLevelJson(levelJson);
         
+        json segmentsJson = json::array();
+        
+        for(SegmentIterator i = segmentBegin(); i != segmentEnd(); ++i) {
+            segmentsJson.push_back(i->saveToJsonObject());
+        }
+        
+        levelJson["segments"] = segmentsJson;
+        
         std::string levelJsonString = levelJson.dump(4);
         saveStringAsFile(levelJsonString, fileName);
+    }
+    
+    void loadLevelFromFile(std::string fileName) {
+        assert(segments.size() == 0);
+        
+        json levelJson = json::parse(loadFileIntoString(fileName));
+        
+        vertexManager.loadVerticesFromLevelJson(levelJson);
+        
+        Prism3D emptyPrism;
+        
+        for(auto segment : levelJson["segments"]) {
+            Segment& seg = addSegment(emptyPrism);
+            seg.loadFromJsonObject(segment);
+        }
+        
+        rebuildAllSurfaces();
+    }
+    
+    TextureManager& getTextureManager() {
+        return textureManager;
+    }
+    
+    VertexManager& getVertexManager() {
+        return vertexManager;
     }
     
     ~Level() {
@@ -379,5 +518,6 @@ public:
 private:
     VertexManager vertexManager;
     std::vector<Segment*> segments;
+    TextureManager& textureManager;
 };
 

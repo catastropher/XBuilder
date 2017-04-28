@@ -52,17 +52,26 @@ public:
     Console(XBuilderContext& context_);
     
     void print(std::string str) {
+        if(!enableLogging)
+            return;
+        
         output += str;
         hasNewText = true;
     }
     
     void printLine(std::string str) {
+        if(!enableLogging)
+            return;
+        
         output += str;
         output += '\n';
         hasNewText = true;
     }
     
     void print(const char* format, ...) {
+        if(!enableLogging)
+            return;
+        
         va_list list;
         va_start(list, format);
         
@@ -89,6 +98,15 @@ public:
     
     void executeCommand(std::string command);
     
+    void executeCommandSilently(std::string command) {
+        bool oldEnableLogging = enableLogging;
+        enableLogging = false;
+        
+        executeCommand(command);
+        
+        enableLogging = oldEnableLogging;
+    }
+    
 private:
     void addCommand(std::string name, std::string description, std::function<void(ConsoleCommandContext&, std::vector<std::string>&)> handler) {
         commands[name] = ConsoleCommand(name, description, handler);
@@ -100,5 +118,6 @@ private:
     std::string output;
     std::map<std::string, ConsoleCommand> commands;
     bool hasNewText;
+    bool enableLogging;
 };
 

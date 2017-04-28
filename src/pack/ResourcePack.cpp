@@ -86,6 +86,9 @@ ResourcePackBuilder::~ResourcePackBuilder() {
 
 
 void ResourcePackExtractor::extractPackFilesToDirectory(string directoryName) {
+    if(directoryName[directoryName.length() - 1] != '/')
+        directoryName += '/';
+    
     if(!x3d_resourcepack_load_from_file(&pack, packFileName.c_str()))
         throw "Failed to open resource pack " + packFileName;
     

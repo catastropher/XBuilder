@@ -15,18 +15,17 @@
 
 #pragma once
 
-#include <vector>
 #include <string>
 
-struct ConsoleCommandContext;
+class Project;
 
-namespace ConsoleCommands {
+class ProjectLoader {
+public:
+    ProjectLoader(std::string fileName_) : fileName(fileName_) { }
     
-void commandClear(ConsoleCommandContext& context, std::vector<std::string>& args);
-void commandEcho(ConsoleCommandContext& context, std::vector<std::string>& args);
-void commandImportTex(ConsoleCommandContext& context, std::vector<std::string>& args);
-void commandSave(ConsoleCommandContext& context, std::vector<std::string>& args);
-void commandLoad(ConsoleCommandContext& context, std::vector<std::string>& args);
-void commandExtractPack(ConsoleCommandContext& context, std::vector<std::string>& args);
-
+    Project* loadFromFile();
+    
+private:
+    std::string fileName;
 };
+

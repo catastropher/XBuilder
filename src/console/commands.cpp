@@ -21,6 +21,7 @@
 #include "pack/DirectoryScanner.hpp"
 #include "XBuilderContext.hpp"
 #include "project/ProjectSaver.hpp"
+#include "project/ProjectLoader.hpp"
 #include "pack/ResourcePack.hpp"
 
 using namespace std;
@@ -42,21 +43,9 @@ void commandImportTex(ConsoleCommandContext& context, std::vector<std::string>& 
     if(args.size() == 0)
         throw "Expected directory to scan for bitmaps";
     
-    try {
-        string directory = args[0];
-        DirectoryScanner scanner(boost::filesystem::path(directory), false);
-        auto files = scanner.recursivelyScanFiles();
-        
-        for(auto file : files) {
-            context.console.printLine("Loading file: " + file);
-            context.context.getProject().getTextureManager().loadTextureFromFile(file);
-        }
-        
-        context.console.printLine("Done.");
-    }
-    catch(boost::filesystem::filesystem_error err) {
-        throw "Could not open directory " + args[0];
-    }
+    context.console.printLine("Importing textures from " + args[0]);
+    context.context.getProject().getTextureManager().recursivelyImportTexturesFromDirectory(args[0]);
+    context.console.printLine("Done.");
 }
 
 void commandSave(ConsoleCommandContext& context, std::vector<std::string>& args) {
@@ -67,6 +56,16 @@ void commandSave(ConsoleCommandContext& context, std::vector<std::string>& args)
     saver.saveToFile(args[0]);
     
     context.console.printLine("Saved to " + args[0]);
+}
+
+void commandLoad(ConsoleCommandContext& context, std::vector<std::string>& args) {
+    if(args.size() == 0)
+        throw "Expected file name to load project from";
+    
+    ProjectLoader loader(args[0]);
+    Project* newProject = loader.loadFromFile();
+    
+    context.context.addEvent(new XBuilderContextChangeProjectEvent(newProject));
 }
 
 void commandExtractPack(ConsoleCommandContext& context, std::vector<std::string>& args) {

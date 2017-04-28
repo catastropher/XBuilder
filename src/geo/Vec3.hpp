@@ -107,5 +107,9 @@ struct Vec3 {
     std::tuple<float, float, float> toTuple() const {
         return std::make_tuple(x, y, z);
     }
+    
+    std::tuple<int, int, int> toIntTuple() const {
+        return std::make_tuple((int)x, (int)y, (int)z);
+    }
 };
 

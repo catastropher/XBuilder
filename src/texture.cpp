@@ -21,6 +21,7 @@
 #include "texture.hpp"
 #include "pack/fileutils.hpp"
 #include "imgui/imgui.h"
+#include "pack/DirectoryScanner.hpp"
 
 using namespace std;
 using namespace boost::filesystem;
@@ -81,7 +82,7 @@ GLuint OpenGLTextureManager::addX3DTexture(X3D_Texture* tex) {
     return uploadByteArrayTexture(texturePixels, tex->w, tex->h);
 }
 
-void LevelTexture::saveToFile(string fileName) {
+void LevelTexture::saveToXtexFile(string fileName) {
     // This should probably be a function in X3D
     FILE* file = fopen(fileName.c_str(), "wb");
     if(!file)
@@ -107,19 +108,53 @@ LevelTexture* TextureManager::addTexture(X3D_Texture tex, string fileName) {
 
 
 LevelTexture* TextureManager::loadTextureFromFile(string fileName) {
-    X3D_Texture x3dTex;
-    if(!x3d_texture_load_from_bmp_file(&x3dTex, fileName.c_str())) {
-        return NULL;
-    }
-    
     string name = path(fileName).filename().string();
+    
+    bool isBmp = name.find(".bmp") != string::npos;
+    bool isXtex = name.find(".xtex") != string::npos;
+    
+    if(!isBmp && !isXtex)
+        return nullptr;
+    
+    X3D_Texture x3dTex;
+    if(isBmp) {
+        if(!x3d_texture_load_from_bmp_file(&x3dTex, fileName.c_str()))
+            return nullptr;
+    }
+    else if(isXtex) {
+        // TODO: this should be an X3D function
+        FILE* file = fopen(fileName.c_str(), "rb");
+        
+        if(!file)
+            return nullptr;
+        
+        int w = readIntFromFile(file);
+        int h = readIntFromFile(file);
+        
+        x3d_texture_init(&x3dTex, w, h, 0);
+        fread(x3dTex.texels, sizeof(X3D_ColorIndex), x3d_texture_total_texels(&x3dTex), file);
+        fclose(file);
+    }
     
     auto lastDotIndex = name.find_last_of("."); 
     
-    if(lastDotIndex != string::npos) {
+    if(lastDotIndex != string::npos)
         name = name.substr(0, lastDotIndex); 
-    }
     
     return addTexture(x3dTex, name);
+}
+
+
+void TextureManager::recursivelyImportTexturesFromDirectory(string directory) {
+    try {
+        DirectoryScanner scanner(boost::filesystem::path(directory), false);
+        auto files = scanner.recursivelyScanFiles();
+        
+        for(auto file : files)
+            loadTextureFromFile(file);
+    }
+    catch(boost::filesystem::filesystem_error err) {
+        throw "Could not open directory " + directory;
+    }
 }
 
