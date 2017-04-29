@@ -23,9 +23,12 @@ using namespace std;
 using namespace boost::filesystem;
 
 void ProjectSaver::saveToFile(string fileName) {
+    path tempDir;
+    path projectDir;
+    
     try {
-        path tempDir = unique_path();
-        path projectDir = tempDir.string() + "/project";
+        tempDir = unique_path();
+        projectDir = tempDir.string() + "/project";
         
         create_directories(projectDir);
         
@@ -43,6 +46,9 @@ void ProjectSaver::saveToFile(string fileName) {
         
     }
     catch(filesystem_error err) {
+        if(exists(tempDir))
+            remove_all(tempDir);
+        
         throw "Failed to save project: " + (string)err.what();
     }
 }
