@@ -174,7 +174,7 @@ public:
         
         geometry.toX3DPolygon3D(poly);
         
-        if(surface.surface.texels)
+        if(surfaceHasAlreadyBeenCreated())
             x3d_surface_update_geometry(&surface, &poly);
         else
             x3d_surface_init(&surface, &poly);
@@ -285,6 +285,10 @@ private:
         surface.textures = &surfaceTextures[0];
     }
     
+    bool surfaceHasAlreadyBeenCreated() const {
+        return surface.surface.texels != nullptr;
+    }
+    
     json saveX3dSurfaceTextureToJson(X3D_SurfaceTexture* tex);
     X3D_SurfaceTexture loadX3dSurfaceTextureFromJson(json& texJson);
     
@@ -355,7 +359,16 @@ public:
     
     bool isDeleted() const { return deleted; }
     int totalFaces() const { return geometry.totalFaces(); }
-    LevelSegmentFace& getFace(int faceId) { return *faces[faceId]; }
+    
+    LevelSegmentFace& getFace(int faceId) {
+        if(faceId >= totalFaces()) {
+            printf("Requested face %d, has %d faces (id %d)\n", faceId, totalFaces(), id);
+        }
+        
+        assert(faceId < totalFaces());
+        return *faces[faceId];
+        
+    }
     Level& getLevel() const { return level; }
     
     void deleteSelf() { deleted = true; }
@@ -448,7 +461,11 @@ public:
     
     Level(TextureManager& textureManager_) : textureManager(textureManager_) { }
     
-    Segment& getSegment(int id) const { return *segments[id]; }
+    Segment& getSegmentById(int id) const {
+        assert(id < (int)segments.size());
+        
+        return *segments[id];
+    }
     SegmentIterator segmentBegin() {return SegmentIterator(&segments[0], &segments[segments.size()]); }
     SegmentIterator segmentEnd() { return SegmentIterator(&segments[segments.size()], &segments[segments.size()]); }
     
@@ -499,6 +516,30 @@ public:
             seg.loadFromJsonObject(segment);
         }
         
+        int segId = 0;
+        for(auto segment : levelJson["segments"]) {
+            printf("Seg %d\n", segId);
+            int faceId = 0;
+            for(auto face : segment["faces"]) {
+                printf("\tProcess face %d\n", faceId);
+                
+                if(face["connectedSegmentId"] != nullptr && face["connectedFaceId"] != nullptr) {
+                
+                    int connectedFace = face["connectedFaceId"];
+                    int connectedSegment = face["connectedSegmentId"];
+                    
+                    LevelSegmentFace& us = getFaceBySegmentAndFaceId(segId, faceId);
+                    LevelSegmentFace& them = getFaceBySegmentAndFaceId(connectedSegment, connectedFace);
+
+                    us.connectToSegmentFace(them);
+                }
+                
+                ++faceId;
+            }
+            
+            ++segId;
+        }
+        
         rebuildAllSurfaces();
     }
     
@@ -508,6 +549,10 @@ public:
     
     VertexManager& getVertexManager() {
         return vertexManager;
+    }
+    
+    LevelSegmentFace& getFaceBySegmentAndFaceId(int segmentId, int faceId) const {
+        return getSegmentById(segmentId).getFace(faceId);
     }
     
     ~Level() {
