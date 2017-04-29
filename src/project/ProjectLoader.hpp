@@ -21,7 +21,7 @@ class Project;
 
 class ProjectLoader {
 public:
-    ProjectLoader(std::string fileName_) : fileName(fileName_) { }
+    ProjectLoader(std::string fileName_) : fileName(fileName_ + ".xproj") { }
     
     Project* loadFromFile();
     
