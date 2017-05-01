@@ -44,7 +44,6 @@ public:
     }
     
 private:
-    
     void renderGeometryPos() const {
         ImGui::Text("Center x: %f y: %f z: %f", newPrismPosition.x, newPrismPosition.y, newPrismPosition.z);
     }
@@ -73,38 +72,49 @@ private:
     }
     
     void calculatePositionFromMouse(MouseState& state) {
-        if(!state.hoverInWindow) {
+        showPreview = state.hoverInWindow;
+        if(!showPreview)
+            return;
+        
+        const int RIGHT_MOUSE_BUTTON = 1;
+        
+        if(ImGui::IsMouseDown(RIGHT_MOUSE_BUTTON))
+            calculateNewElevationFromMouse(state);
+        else
+            calculateNewPrismPositionFromMouse(state);
+    }
+    
+    void calculateNewElevationFromMouse(MouseState& state) {
+        X3D_CameraObject* cam = getViewWindowCamera();
+        Plane viewPlane = Plane::constructParallelToCameraView(cam, newPrismPosition);
+        Ray ray = Ray::constructThroughPointOnScreen(state.pos, cam);
+        PlaneIntersection intersection;
+        
+        if(!viewPlane.rayIntersectsPlane(ray, intersection, true)) {
             showPreview = false;
             return;
         }
         
-        X3D_CameraObject* cam = x3d_playermanager_get()->player[0].cam;
+        elevationWidget.setDistance(Distance(intersection.intersection.y, Distance::X3D_UNITS));
+        newPrismPosition.y = intersection.intersection.y;
+    }
+    
+    void calculateNewPrismPositionFromMouse(MouseState& state) {
+        Plane plane = Plane::constructHorizontal(elevationWidget.getDistanceInUnits(), true);
+        X3D_CameraObject* cam = getViewWindowCamera();
         Ray ray = Ray::constructThroughPointOnScreen(state.pos, cam);
         PlaneIntersection intersection;
         
-        if(ImGui::IsMouseDown(1)) {
-            Plane viewPlane = Plane::constructParallelToCameraView(cam, newPrismPosition);
-            
-            if(!viewPlane.rayIntersectsPlane(ray, intersection, true)) {
-                showPreview = false;
-                return;
-            }
-            
-            elevationWidget.setDistance(Distance(intersection.intersection.y, Distance::X3D_UNITS));
-            newPrismPosition.y = intersection.intersection.y;
-        }
-        else {
-            Plane plane = Plane::constructHorizontal(elevationWidget.getDistanceInUnits(), true);
-            
-            if(!plane.rayIntersectsPlane(ray, intersection, true)) {
-                showPreview = false;
-                return;
-            }
-            
-            newPrismPosition = intersection.intersection;
+        if(!plane.rayIntersectsPlane(ray, intersection, true)) {
+            showPreview = false;
+            return;
         }
         
-        showPreview = true;
+        newPrismPosition = intersection.intersection;
+    }
+    
+    X3D_CameraObject* getViewWindowCamera() const {
+        return x3d_playermanager_get()->player[0].cam;
     }
     
     DistanceUnitSelectorWidget unitSelectorWidget;
